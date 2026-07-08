@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tariq Store - POS System v2.0",
-  description: "Modern Point of Sale System with Customer Card, Barcode, Cloud Backup",
+  title: "Tariq Kiryana Store - POS System v2.0",
+  description: "Modern Point of Sale System with Customer Card, Barcode, Cloud Backup, Multi-language, Network Sharing",
 };
 
 export default function RootLayout({
@@ -24,12 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ur" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         {children}
-        <Toaster position="top-right" />
       </body>
     </html>
   );
