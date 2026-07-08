@@ -1,0 +1,331 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ========== MASTER DATA ==========
+
+model ProductCategory {
+  id        String   @id @default(cuid())
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  products  ProductSubCategory[]
+}
+
+model ProductSubCategory {
+  id          String          @id @default(cuid())
+  name        String
+  categoryId  String
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  products    Product[]
+}
+
+model ProductGroup {
+  id        String   @id @default(cuid())
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  products  Product[]
+}
+
+model Unit {
+  id        String   @id @default(cuid())
+  name      String
+  shortName String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  products  Product[]
+}
+
+// ========== PRODUCTS ==========
+
+model Product {
+  id              String            @id @default(cuid())
+  barcode         String            @unique
+  name            String
+  subCategoryId   String?
+  subCategory     ProductSubCategory? @relation(fields: [subCategoryId], references: [id])
+  groupId         String?
+  group           ProductGroup?     @relation(fields: [groupId], references: [id])
+  unitId          String?
+  unit            Unit?             @relation(fields: [unitId], references: [id])
+  purchasePrice   Float             @default(0)
+  salePrice       Float             @default(0)
+  wholeSalePrice  Float             @default(0)
+  stock           Float             @default(0)
+  minStock        Float             @default(0)
+  isActive        Boolean           @default(true)
+  hasImage        Boolean           @default(false)
+  imageUrl        String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  saleItems       SaleItem[]
+  purchaseItems   PurchaseItem[]
+  stockAdjustments StockAdjustment[]
+}
+
+// ========== CUSTOMERS (with Card System) ==========
+
+model Customer {
+  id          String   @id @default(cuid())
+  barcode     String   @unique
+  name        String
+  phone       String?
+  address     String?
+  comments    String?
+  openingBalance Float @default(0)
+  balance     Float    @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  sales       Sale[]
+  returns     SaleReturn[]
+  cashReceives CashReceive[]
+}
+
+model CashReceive {
+  id          String   @id @default(cuid())
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id])
+  amount      Float
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+// ========== PARTIES (Vendors) ==========
+
+model Party {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String?
+  address     String?
+  openingBalance Float @default(0)
+  balance     Float    @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  purchases   Purchase[]
+  purchaseReturns PurchaseReturn[]
+  cashPayments CashPayment[]
+}
+
+model CashPayment {
+  id          String   @id @default(cuid())
+  partyId     String
+  party       Party    @relation(fields: [partyId], references: [id])
+  amount      Float
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+// ========== SALES ==========
+
+model Sale {
+  id            String      @id @default(cuid())
+  invoiceNo     String      @unique
+  customerId    String?
+  customer      Customer?   @relation(fields: [customerId], references: [id])
+  saleManName   String?
+  saleType      String      @default("cash") // cash, credit, wholeSale
+  subtotal      Float       @default(0)
+  discountAmount Float      @default(0)
+  total         Float       @default(0)
+  paid          Float       @default(0)
+  remarks       String?
+  createdAt     DateTime    @default(now())
+  items         SaleItem[]
+}
+
+model SaleItem {
+  id          String  @id @default(cuid())
+  saleId      String
+  sale        Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product @relation(fields: [productId], references: [id])
+  productName String
+  quantity    Float
+  price       Float
+  total       Float
+}
+
+model SaleReturn {
+  id            String          @id @default(cuid())
+  returnNo      String          @unique
+  customerId    String?
+  customer      Customer?       @relation(fields: [customerId], references: [id])
+  originalInvoiceNo String?
+  subtotal      Float           @default(0)
+  total         Float           @default(0)
+  createdAt     DateTime        @default(now())
+  items         SaleReturnItem[]
+}
+
+model SaleReturnItem {
+  id          String     @id @default(cuid())
+  returnId    String
+  return      SaleReturn @relation(fields: [returnId], references: [id], onDelete: Cascade)
+  productId   String
+  productName String
+  quantity    Float
+  price       Float
+  total       Float
+}
+
+// ========== PURCHASES ==========
+
+model Purchase {
+  id            String          @id @default(cuid())
+  invoiceNo     String          @unique
+  partyId       String?
+  party         Party?          @relation(fields: [partyId], references: [id])
+  purchaseType  String          @default("cash") // cash, credit
+  subtotal      Float           @default(0)
+  total         Float           @default(0)
+  paid          Float           @default(0)
+  remarks       String?
+  createdAt     DateTime        @default(now())
+  items         PurchaseItem[]
+}
+
+model PurchaseItem {
+  id          String   @id @default(cuid())
+  purchaseId  String
+  purchase    Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  productName String
+  quantity    Float
+  price       Float
+  total       Float
+}
+
+model PurchaseReturn {
+  id            String             @id @default(cuid())
+  returnNo      String             @unique
+  partyId       String?
+  party         Party?             @relation(fields: [partyId], references: [id])
+  originalInvoiceNo String?
+  subtotal      Float              @default(0)
+  total         Float              @default(0)
+  createdAt     DateTime           @default(now())
+  items         PurchaseReturnItem[]
+}
+
+model PurchaseReturnItem {
+  id          String         @id @default(cuid())
+  returnId    String
+  return      PurchaseReturn @relation(fields: [returnId], references: [id], onDelete: Cascade)
+  productId   String
+  productName String
+  quantity    Float
+  price       Float
+  total       Float
+}
+
+// ========== STOCK ==========
+
+model StockAdjustment {
+  id          String  @id @default(cuid())
+  productId   String
+  product     Product @relation(fields: [productId], references: [id])
+  oldStock    Float
+  newStock    Float
+  difference  Float
+  reason      String?
+  createdAt   DateTime @default(now())
+}
+
+// ========== EXPENSES ==========
+
+model ExpenseType {
+  id        String    @id @default(cuid())
+  name      String
+  isActive  Boolean   @default(true)
+  expenses  Expense[]
+  createdAt DateTime  @default(now())
+}
+
+model Expense {
+  id            String      @id @default(cuid())
+  expenseTypeId String
+  expenseType   ExpenseType @relation(fields: [expenseTypeId], references: [id])
+  amount        Float
+  description   String?
+  createdAt     DateTime    @default(now())
+}
+
+// ========== BANK ==========
+
+model BankAccount {
+  id        String   @id @default(cuid())
+  bankName  String
+  branchName String?
+  accountNo String?
+  phone     String?
+  balance   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  transactions BankTransaction[]
+}
+
+model BankTransaction {
+  id            String       @id @default(cuid())
+  bankAccountId String
+  bankAccount   BankAccount  @relation(fields: [bankAccountId], references: [id])
+  type          String       // deposit, draw
+  amount        Float
+  description   String?
+  createdAt     DateTime     @default(now())
+}
+
+// ========== CAPITAL ==========
+
+model Capital {
+  id        String   @id @default(cuid())
+  total     Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ========== SALESMAN ==========
+
+model SalesMan {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ========== SETTINGS ==========
+
+model Settings {
+  id              String   @id @default(cuid())
+  storeName       String   @default("Tariq Store")
+  storeAddress    String?
+  storePhone      String?
+  invoicePrefix   String   @default("INV")
+  saleInvoiceNo   Int      @default(1)
+  purchaseInvoiceNo Int    @default(1)
+  saleReturnNo    Int      @default(1)
+  purchaseReturnNo Int     @default(1)
+  autoPrint       Boolean  @default(false)
+  defaultPrinter  String?
+  supabaseUrl     String?
+  supabaseKey     String?
+  lastSyncAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
