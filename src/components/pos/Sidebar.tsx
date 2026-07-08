@@ -1,21 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   LayoutDashboard, Package, Users, ShoppingCart, Truck, Warehouse,
   DollarSign, Settings, CreditCard, TrendingUp, AlertTriangle,
-  LogOut, Languages, Sun, Moon, UserCog, Wifi, ChevronLeft, ChevronRight
+  LogOut, Languages, Sun, Moon, UserCog, Wifi, ChevronLeft, ChevronRight,
+  Bell, UserCircle, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { useAppStore } from '@/store/app-store';
+import { useAppStore, Notification } from '@/store/app-store';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
-type Page = 'dashboard' | 'products' | 'customers' | 'sales' | 'purchases' | 'stock' | 'expenses' | 'bank' | 'reports' | 'users' | 'settings' | 'network';
+type Page = 'dashboard' | 'products' | 'customers' | 'sales' | 'purchases' | 'stock' | 'expenses' | 'bank' | 'reports' | 'users' | 'settings' | 'network' | 'my_settings';
 
 interface NavItem {
   id: Page;
@@ -51,8 +52,28 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
   lowStockCount: number;
 }) {
   const [collapsed, setCollapsed] = useState(false);
-  const { user, logout, lang, toggleLang, theme, toggleTheme } = useAppStore();
+  const [showNotif, setShowNotif] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const { user, logout, lang, toggleLang, theme, toggleTheme, notifications, markAllRead } = useAppStore();
   const isDark = theme === 'dark';
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Close notif panel on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setShowNotif(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Filter nav items by permission
+  const visibleNavItems = navItems.filter(item => {
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    if (!user.permissions || Object.keys(user.permissions).length === 0) return true;
+    return user.permissions[item.id] === true;
+  });
 
   return (
     <div className={cn(
@@ -80,8 +101,8 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
         </Button>
       </div>
 
-      {/* Language + Theme Buttons */}
-      <div className={cn("flex gap-1 px-2 py-2 border-b border-slate-700/50", collapsed && "justify-center")}>
+      {/* Top Controls: Language + Theme + Notification */}
+      <div className={cn("flex gap-1 px-2 py-2 border-b border-slate-700/50", collapsed && "justify-center flex-wrap")}>
         <Button
           variant="ghost" size="icon"
           className={cn("h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-700", lang === 'ur' && 'text-emerald-400')}
@@ -96,12 +117,81 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
         >
           {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>
+        {/* Notification Bell */}
+        <div className="relative" ref={notifRef}>
+          <Button
+            variant="ghost" size="icon"
+            className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-700"
+            onClick={() => setShowNotif(!showNotif)}
+          >
+            <Bell className="h-4 w-4" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </Button>
+          {/* Notification Panel */}
+          {showNotif && (
+            <div className={cn(
+              "absolute top-10 z-50 w-80 rounded-xl border shadow-xl overflow-hidden",
+              isDark ? 'bg-slate-800 border-slate-600' : 'bg-white border-slate-200'
+            )} style={{ left: collapsed ? '-260px' : 'auto', right: collapsed ? 'auto' : 0 }}>
+              <div className="p-3 flex items-center justify-between border-b border-slate-700/50">
+                <h3 className="font-bold text-sm text-white">{t('notif.title', lang)}</h3>
+                {unreadCount > 0 && (
+                  <button onClick={markAllRead} className="text-xs text-emerald-400 hover:text-emerald-300">
+                    {t('notif.clear', lang)}
+                  </button>
+                )}
+              </div>
+              <div className="max-h-64 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <p className="text-center text-sm text-slate-400 py-6">{t('notif.no_notif', lang)}</p>
+                ) : notifications.slice(0, 10).map(n => (
+                  <div key={n.id} className={cn(
+                    "p-3 border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors",
+                    n.read && 'opacity-50'
+                  )}>
+                    <div className="flex items-start gap-2">
+                      {n.type === 'low_stock' && <AlertTriangle className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0" />}
+                      {n.type === 'update' && <TrendingUp className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />}
+                      {n.type === 'info' && <Bell className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />}
+                      <div>
+                        <p className="text-sm font-medium text-white">{n.title}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{n.message}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Navigation */}
       <ScrollArea className="flex-1 py-2">
+        {/* NEW SALE BUTTON - Right after Dashboard */}
+        <div className={cn("px-1 mb-2", collapsed && "px-0.5")}>
+          <Button
+            className={cn(
+              "w-full h-12 text-sm font-bold gap-2 rounded-xl",
+              "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20",
+              collapsed && "h-10 px-2"
+            )}
+            onClick={() => onNavigate('sales')}
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {!collapsed && t('nav.new_sale', lang)}
+          </Button>
+        </div>
+
+        <Separator className="mx-2 mb-2 bg-slate-700/30" />
+
         {sections.map(section => {
-          const items = navItems.filter(n => n.section === section.key);
+          const items = visibleNavItems.filter(n => n.section === section.key);
+          if (items.length === 0) return null;
           return (
             <div key={section.key} className="mb-2">
               {!collapsed && (
@@ -135,35 +225,38 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
         })}
       </ScrollArea>
 
-      {/* NEW SALE BUTTON - At the very bottom before footer */}
-      <div className={cn("px-2", collapsed ? "px-1" : "")}>
-        <Button
-          className={cn(
-            "w-full h-14 text-base font-bold gap-2 rounded-xl",
-            "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30",
-            collapsed && "h-12 px-2"
-          )}
-          onClick={() => onNavigate('sales')}
-        >
-          <ShoppingCart className="h-6 w-6" />
-          {!collapsed && t('nav.sales', lang)}
-        </Button>
-      </div>
-
       <div className="h-2" />
 
-      {/* User + Logout */}
+      {/* User + My Settings + Logout */}
       <div className={cn("border-t border-slate-700/50 p-2", collapsed && "flex flex-col items-center gap-1")}>
         {!collapsed && user && (
           <div className="flex items-center gap-2 px-2 py-1 mb-1">
             <Avatar className="h-7 w-7">
               <AvatarFallback className="bg-emerald-600 text-white text-xs">{user.fullName[0]}</AvatarFallback>
             </Avatar>
-            <div className="overflow-hidden">
+            <div className="overflow-hidden flex-1">
               <p className="text-xs font-medium text-white truncate">{user.fullName}</p>
               <p className="text-[10px] text-slate-400">{user.role}</p>
             </div>
+            <Button
+              variant="ghost" size="icon"
+              className="h-7 w-7 text-slate-400 hover:text-white hover:bg-slate-700"
+              onClick={() => onNavigate('my_settings')}
+              title={t('nav.my_settings', lang)}
+            >
+              <UserCircle className="h-4 w-4" />
+            </Button>
           </div>
+        )}
+        {collapsed && user && (
+          <Button
+            variant="ghost" size="icon"
+            className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-700 mb-1"
+            onClick={() => onNavigate('my_settings')}
+            title={t('nav.my_settings', lang)}
+          >
+            <UserCircle className="h-4 w-4" />
+          </Button>
         )}
         <Button
           variant="ghost"

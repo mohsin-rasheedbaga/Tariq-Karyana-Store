@@ -4,9 +4,10 @@ export const translations: Record<Lang, Record<string, string>> = {
   en: {
     // Sidebar
     'nav.dashboard': 'Dashboard',
+    'nav.new_sale': 'New Sale',
     'nav.products': 'Products',
     'nav.customers': 'Customers',
-    'nav.sales': 'New Sale',
+    'nav.sales': 'Sales',
     'nav.purchases': 'Purchases',
     'nav.stock': 'Stock',
     'nav.expenses': 'Expenses',
@@ -15,6 +16,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.users': 'Users',
     'nav.settings': 'Settings',
     'nav.network': 'Network',
+    'nav.my_settings': 'My Settings',
     'nav.logout': 'Logout',
     'nav.main': 'Main',
     'nav.inventory': 'Inventory',
@@ -22,6 +24,15 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.system': 'System',
     'nav.sync_ready': 'Local DB + Cloud Sync Ready',
     'nav.low_stock': 'Low',
+
+    // Notifications
+    'notif.title': 'Notifications',
+    'notif.clear': 'Mark all as read',
+    'notif.low_stock': 'Low Stock Alert',
+    'notif.low_stock_msg': 'is running low on stock',
+    'notif.no_notif': 'No new notifications',
+    'notif.update_avail': 'Update Available',
+    'notif.update_msg': 'A new version is available',
 
     // Dashboard
     'dash.title': 'Dashboard',
@@ -34,7 +45,21 @@ export const translations: Record<Lang, Record<string, string>> = {
     'dash.all_stock_ok': 'All products stock is OK',
     'dash.recent_sales': 'Recent Sales',
     'dash.no_sales': 'No sales yet',
+    'dash.sales_summary': 'Sales Summary',
+    'dash.stock_overview': 'Stock Overview',
+    'dash.quick_actions': 'Quick Actions',
+    'dash.new_sale': 'New Sale',
+    'dash.add_product': 'Add Product',
+    'dash.add_customer': 'Add Customer',
     'dash.no_product': 'No product',
+    'dash.invoice': 'Invoice',
+    'dash.customer': 'Customer',
+    'dash.amount': 'Amount',
+    'dash.time': 'Time',
+    'dash.type': 'Type',
+    'dash.total_stock_value': 'Total Stock Value',
+    'dash.profit_today': "Today's Profit",
+    'dash.net_sales': 'Net Sales',
 
     // Products
     'prod.title': 'Product Management',
@@ -57,6 +82,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     'prod.update': 'Update',
     'prod.auto_barcode': 'Auto generated',
     'prod.disable': 'Are you sure you want to disable this product?',
+    'prod.select_unit': 'Select Unit',
+    'prod.select_group': 'Select Group',
+    'prod.select_category': 'Select Category',
 
     // Customers
     'cust.title': 'Customers & Card System',
@@ -76,6 +104,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     'cust.card': 'Customer Card',
     'cust.scan_prompt': 'Scan barcode to start shopping!',
     'cust.disable': 'Are you sure you want to disable this customer?',
+    'cust.phone_placeholder': '03XX-XXXXXXX',
+    'cust.name_placeholder': 'Name',
+    'cust.address_placeholder': 'Address',
+    'cust.comments_placeholder': 'Special notes about customer...',
 
     // Sales
     'sale.title': 'New Sale',
@@ -101,6 +133,18 @@ export const translations: Record<Lang, Record<string, string>> = {
     'sale.customer': 'Customer',
     'sale.balance_will': 'Balance will be',
     'sale.new_balance': 'New Balance',
+    'sale.invoice_created': 'Invoice created!',
+    'sale.stock_only': 'Only in stock',
+    'sale.more_than_stock': 'More than stock',
+    'sale.product_added': 'added',
+    'sale.product_not_found': 'Product not found',
+    'sale.error': 'Error',
+    'sale.customer_selected': 'Customer:',
+    'sale.clear_cart': 'Clear Cart',
+    'sale.cart_cleared': 'Cart cleared',
+    'sale.product_search': 'Search product...',
+    'sale.stock_label': 'Stock',
+    'sale.name_placeholder': 'Name',
 
     // Purchases
     'purch.title': 'Purchases',
@@ -120,6 +164,11 @@ export const translations: Record<Lang, Record<string, string>> = {
     'purch.phone': 'Phone',
     'purch.address': 'Address',
     'purch.save_party': 'Save',
+    'purch.invoice_created': 'Purchase invoice created!',
+    'purch.no_items': 'No items',
+    'purch.product_added': 'added',
+    'purch.remarks_placeholder': 'Remarks',
+    'purch.cleared': 'Cleared',
 
     // Stock
     'stock.title': 'Stock Management',
@@ -136,6 +185,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'stock.new_stock': 'New Stock',
     'stock.reason': 'Reason',
     'stock.update': 'Update',
+    'stock.stock_updated': 'Stock updated',
+    'stock.reason_placeholder': 'Write reason...',
 
     // Expenses
     'exp.title': 'Expenses',
@@ -150,6 +201,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     'exp.type_name': 'Type Name',
     'exp.no_expenses': 'No expenses',
     'exp.save': 'Save',
+    'exp.saved': 'Expense saved',
+    'exp.type_created': 'Type created',
+    'exp.fill_fields': 'Fill all fields',
+    'exp.new_expense_type': 'New Expense Type',
 
     // Bank
     'bank.title': 'Bank Accounts',
@@ -168,6 +223,11 @@ export const translations: Record<Lang, Record<string, string>> = {
     'bank.no_txn': 'No transactions',
     'bank.no_accounts': 'No accounts',
     'bank.save': 'Save',
+    'bank.deposit_done': 'Deposit successful',
+    'bank.draw_done': 'Withdrawal successful',
+    'bank.new_bank_account': 'New Bank Account',
+    'bank.deposit_label': 'Deposit',
+    'bank.draw_label': 'Withdrawal',
 
     // Users
     'user.title': 'User Management',
@@ -189,6 +249,37 @@ export const translations: Record<Lang, Record<string, string>> = {
     'user.delete': 'Delete',
     'user.save': 'Save',
     'user.confirm_delete': 'Are you sure you want to delete this user?',
+    'user.permissions': 'Permissions',
+    'user.perm_dashboard': 'Dashboard',
+    'user.perm_sales': 'Sales',
+    'user.perm_products': 'Products (Add/Edit)',
+    'user.perm_customers': 'Customers',
+    'user.perm_purchases': 'Purchases',
+    'user.perm_stock': 'Stock Management',
+    'user.perm_expenses': 'Expenses',
+    'user.perm_bank': 'Bank',
+    'user.perm_reports': 'Reports',
+    'user.perm_settings': 'Settings',
+    'user.perm_users': 'User Management',
+    'user.password_required': 'Password required',
+    'user.cannot_delete_self': 'Cannot delete yourself',
+    'user.never_login': 'Never logged in',
+    'user.created': 'User created',
+    'user.updated': 'User updated',
+    'user.deleted': 'User deleted',
+    'user.leave_empty': '(leave empty to keep)',
+
+    // My Settings
+    'myset.title': 'My Settings',
+    'myset.change_password': 'Change Password',
+    'myset.current_password': 'Current Password',
+    'myset.new_password': 'New Password',
+    'myset.confirm_password': 'Confirm Password',
+    'myset.save': 'Save Changes',
+    'myset.password_changed': 'Password changed successfully',
+    'myset.wrong_current': 'Current password is wrong',
+    'myset.passwords_no_match': 'New passwords do not match',
+    'myset.fill_all': 'Fill all password fields',
 
     // Login
     'login.title': 'Tariq Kiryana Store',
@@ -198,6 +289,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'login.login': 'Login',
     'login.error': 'Invalid username or password',
     'login.welcome': 'Welcome',
+    'login.account_disabled': 'Account disabled',
+    'login.default': 'Default: admin / admin123',
 
     // Settings
     'set.title': 'Settings',
@@ -208,7 +301,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'set.auto_print': 'Auto Print',
     'set.auto_print_desc': 'Auto print bill on sale save',
     'set.cloud_backup': 'Cloud Backup (Supabase)',
-    'set.cloud_desc': 'Connect Supabase to keep your data safe online',
+    'set.cloud_desc': 'Connect Supabase to keep your data safe online. Data stays safe even if computer fails.',
     'set.supabase_url': 'Supabase URL',
     'set.supabase_key': 'Supabase Key',
     'set.sync_now': 'Sync Now',
@@ -216,6 +309,20 @@ export const translations: Record<Lang, Record<string, string>> = {
     'set.architecture': 'System Architecture',
     'set.save_settings': 'Save Settings',
     'set.saving': 'Saving...',
+    'set.saved': 'Settings saved',
+    'set.sync_coming': 'Sync feature will be active soon',
+    'set.arch_desc': 'This system is built with modern technology:',
+    'set.arch_frontend': 'Frontend',
+    'set.arch_db': 'Database',
+    'set.arch_cloud': 'Cloud',
+    'set.arch_barcode': 'Barcode',
+    'set.arch_source': 'Source Code',
+    'set.arch_backup': 'Backup',
+    'set.update': 'Auto Update',
+    'set.update_desc': 'Software auto-updates with delta updates. Your data is never lost.',
+    'set.check_update': 'Check for Updates',
+    'set.up_to_date': 'Software is up to date',
+    'set.version': 'Version',
 
     // Network
     'net.title': 'Network Sharing',
@@ -226,6 +333,24 @@ export const translations: Record<Lang, Record<string, string>> = {
     'net.this_device': 'This Device',
     'net.sync_active': 'Live Sync Active',
     'net.room_code': 'Room Code',
+    'net.start_sharing': 'Start Sharing',
+    'net.disconnect': 'Disconnect',
+    'net.room_desc': 'Use this code on other computers to connect to this system',
+    'net.note': 'Note: All computers must be on the same WiFi network. Live data sync via WebSocket.',
+
+    // Reports
+    'rpt.title': 'Reports',
+    'rpt.coming_soon': 'Reports section will be completed soon. Basic stats are available on Dashboard.',
+    'rpt.sales_report': 'Sales Report',
+    'rpt.purchase_report': 'Purchase Report',
+    'rpt.stock_report': 'Stock Report',
+    'rpt.profit_report': 'Profit Report',
+    'rpt.expense_report': 'Expense Report',
+    'rpt.sales_desc': 'Daily, weekly, monthly sales',
+    'rpt.purchase_desc': 'Party-wise, daily purchases',
+    'rpt.stock_desc': 'Group-wise, company-wise stock',
+    'rpt.profit_desc': 'Daily, invoice-wise profit',
+    'rpt.expense_desc': 'Type-wise, daily expenses',
 
     // Common
     'common.save': 'Save',
@@ -237,10 +362,12 @@ export const translations: Record<Lang, Record<string, string>> = {
     'common.delete': 'Delete',
     'common.actions': 'Actions',
     'common.currency': 'Rs',
+    'common.name': 'Name',
   },
   ur: {
     // Sidebar
     'nav.dashboard': 'ڈیش بورڈ',
+    'nav.new_sale': 'نیا سیل',
     'nav.products': 'پراڈکٹس',
     'nav.customers': 'کسٹمرز',
     'nav.sales': 'نیا سیل',
@@ -252,6 +379,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.users': 'یوزرز',
     'nav.settings': 'سیٹنگز',
     'nav.network': 'نیٹ ورک',
+    'nav.my_settings': 'میری سیٹنگز',
     'nav.logout': 'لاگ آؤٹ',
     'nav.main': 'مرکزی',
     'nav.inventory': 'انونٹری',
@@ -259,6 +387,15 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.system': 'سسٹم',
     'nav.sync_ready': 'لوکل DB + کلاؤڈ سنک تیار',
     'nav.low_stock': 'کم',
+
+    // Notifications
+    'notif.title': 'نوٹیفکیشنز',
+    'notif.clear': 'سب پڑھے ہوئے',
+    'notif.low_stock': 'کم اسٹاک الرٹ',
+    'notif.low_stock_msg': 'کا اسٹاک کم ہو رہا ہے',
+    'notif.no_notif': 'کوئی نئی نوٹیفکیشن نہیں',
+    'notif.update_avail': 'اپڈیٹ دستیاب',
+    'notif.update_msg': 'نئی ورژن دستیاب ہے',
 
     // Dashboard
     'dash.title': 'ڈیش بورڈ',
@@ -271,7 +408,21 @@ export const translations: Record<Lang, Record<string, string>> = {
     'dash.all_stock_ok': 'تمام پراڈکٹس کا اسٹاک ٹھیک ہے',
     'dash.recent_sales': 'حالیہ فروخت',
     'dash.no_sales': 'ابھی کوئی فروخت نہیں',
+    'dash.sales_summary': 'فروخت کا خلاصہ',
+    'dash.stock_overview': 'اسٹاک کا جائزہ',
+    'dash.quick_actions': 'فوری عمل',
+    'dash.new_sale': 'نیا سیل',
+    'dash.add_product': 'پراڈکٹ ایڈ',
+    'dash.add_customer': 'کسٹمر ایڈ',
     'dash.no_product': 'کوئی پراڈکٹ نہیں',
+    'dash.invoice': 'انوائس',
+    'dash.customer': 'کسٹمر',
+    'dash.amount': 'رقم',
+    'dash.time': 'وقت',
+    'dash.type': 'قسم',
+    'dash.total_stock_value': 'کل اسٹاک ویلیو',
+    'dash.profit_today': 'آج کا منافع',
+    'dash.net_sales': 'نیٹ فروخت',
 
     // Products
     'prod.title': 'پراڈکٹس مینجمنٹ',
@@ -294,6 +445,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     'prod.update': 'اپ ڈیٹ',
     'prod.auto_barcode': 'خودکار بنے گا',
     'prod.disable': 'کیا آپ یہ پراڈکٹ غیر فعال کرنا چاہتے ہیں؟',
+    'prod.select_unit': 'یونٹ منتخب کریں',
+    'prod.select_group': 'گروپ منتخب کریں',
+    'prod.select_category': 'کیٹیگری منتخب کریں',
 
     // Customers
     'cust.title': 'کسٹمرز اور کارڈ سسٹم',
@@ -313,6 +467,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     'cust.card': 'کسٹمر کارڈ',
     'cust.scan_prompt': 'بارکوڈ سکین کریں اور خریداری شروع کریں!',
     'cust.disable': 'کیا آپ یہ کسٹمر غیر فعال کرنا چاہتے ہیں؟',
+    'cust.phone_placeholder': '03XX-XXXXXXX',
+    'cust.name_placeholder': 'نام',
+    'cust.address_placeholder': 'پتہ',
+    'cust.comments_placeholder': 'کسٹمر کے بارے میں کوئی خاص بات...',
 
     // Sales
     'sale.title': 'نیا سیل',
@@ -338,6 +496,18 @@ export const translations: Record<Lang, Record<string, string>> = {
     'sale.customer': 'کسٹمر',
     'sale.balance_will': 'بیلنس بنے گا',
     'sale.new_balance': 'نیا بیلنس',
+    'sale.invoice_created': 'انوائس بن گیا!',
+    'sale.stock_only': 'اسٹاک میں صرف',
+    'sale.more_than_stock': 'اسٹاک سے زیادہ نہیں',
+    'sale.product_added': 'ایڈ ہوا',
+    'sale.product_not_found': 'پراڈکٹ نہیں ملا',
+    'sale.error': 'خرابی',
+    'sale.customer_selected': 'کسٹمر:',
+    'sale.clear_cart': 'کارٹ خالی',
+    'sale.cart_cleared': 'کارٹ خالی',
+    'sale.product_search': 'پراڈکٹ سیرچ...',
+    'sale.stock_label': 'اسٹاک',
+    'sale.name_placeholder': 'نام',
 
     // Purchases
     'purch.title': 'خریداری',
@@ -357,6 +527,11 @@ export const translations: Record<Lang, Record<string, string>> = {
     'purch.phone': 'فون',
     'purch.address': 'پتہ',
     'purch.save_party': 'محفوظ',
+    'purch.invoice_created': 'پچیس انوائس بن گیا!',
+    'purch.no_items': 'کوئی آئٹم نہیں',
+    'purch.product_added': 'ایڈ ہوا',
+    'purch.remarks_placeholder': 'ریمارکس',
+    'purch.cleared': 'خالی',
 
     // Stock
     'stock.title': 'اسٹاک مینجمنٹ',
@@ -373,6 +548,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'stock.new_stock': 'نئا اسٹاک',
     'stock.reason': 'وجہ',
     'stock.update': 'اپ ڈیٹ',
+    'stock.stock_updated': 'اسٹاک اپ ڈیٹ',
+    'stock.reason_placeholder': 'وجہ لکھیں...',
 
     // Expenses
     'exp.title': 'اخراجات',
@@ -387,6 +564,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     'exp.type_name': 'ٹائپ نام',
     'exp.no_expenses': 'کوئی اخراجہ نہیں',
     'exp.save': 'محفوظ',
+    'exp.saved': 'اخراجہ محفوظ',
+    'exp.type_created': 'ٹائپ بن گیا',
+    'exp.fill_fields': 'تمام فیلڈز بھریں',
+    'exp.new_expense_type': 'نیا اخراجات ٹائپ',
 
     // Bank
     'bank.title': 'بینک اکاؤنٹس',
@@ -405,6 +586,11 @@ export const translations: Record<Lang, Record<string, string>> = {
     'bank.no_txn': 'کوئی ٹرانزیکشن نہیں',
     'bank.no_accounts': 'کوئی اکاؤنٹ نہیں',
     'bank.save': 'محفوظ',
+    'bank.deposit_done': 'امانت داخل',
+    'bank.draw_done': 'امانت خارج',
+    'bank.new_bank_account': 'نیا بینک اکاؤنٹ',
+    'bank.deposit_label': 'امانت داخل (Deposit)',
+    'bank.draw_label': 'امانت خارج (Draw)',
 
     // Users
     'user.title': 'یوزر مینجمنٹ',
@@ -426,6 +612,37 @@ export const translations: Record<Lang, Record<string, string>> = {
     'user.delete': 'حذف',
     'user.save': 'محفوظ',
     'user.confirm_delete': 'کیا آپ یہ یوزر حذف کرنا چاہتے ہیں؟',
+    'user.permissions': 'پرمیشنز',
+    'user.perm_dashboard': 'ڈیش بورڈ',
+    'user.perm_sales': 'سیل',
+    'user.perm_products': 'پراڈکٹس (ایڈ/ایڈٹ)',
+    'user.perm_customers': 'کسٹمرز',
+    'user.perm_purchases': 'خریداری',
+    'user.perm_stock': 'اسٹاک مینجمنٹ',
+    'user.perm_expenses': 'اخراجات',
+    'user.perm_bank': 'بینک',
+    'user.perm_reports': 'ریپورٹس',
+    'user.perm_settings': 'سیٹنگز',
+    'user.perm_users': 'یوزر مینجمنٹ',
+    'user.password_required': 'پاسورڈ ضروری ہے',
+    'user.cannot_delete_self': 'خود کو حذف نہیں کر سکتے',
+    'user.never_login': 'کبھی لاگ ان نہیں',
+    'user.created': 'یوزر بن گیا',
+    'user.updated': 'اپ ڈیٹ',
+    'user.deleted': 'حذف',
+    'user.leave_empty': '(خالی چھوڑیں پرانہ رکھنے کے لیے)',
+
+    // My Settings
+    'myset.title': 'میری سیٹنگز',
+    'myset.change_password': 'پاسورڈ تبدیل',
+    'myset.current_password': 'موجودہ پاسورڈ',
+    'myset.new_password': 'نیا پاسورڈ',
+    'myset.confirm_password': 'پاسورڈ دوبارہ',
+    'myset.save': 'محفوظ کریں',
+    'myset.password_changed': 'پاسورڈ تبدیل ہو گیا',
+    'myset.wrong_current': 'موجودہ پاسورڈ غلط ہے',
+    'myset.passwords_no_match': 'نئے پاسورڈز مماثل نہیں',
+    'myset.fill_all': 'تمام پاسورڈ فیلڈز بھریں',
 
     // Login
     'login.title': 'طارق کریانہ سٹور',
@@ -435,6 +652,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'login.login': 'لاگ ان',
     'login.error': 'غلط یوزر نیم یا پاسورڈ',
     'login.welcome': 'خوش آمدید',
+    'login.account_disabled': 'اکاؤنٹ غیر فعال ہے',
+    'login.default': 'ڈیفالٹ: admin / admin123',
 
     // Settings
     'set.title': 'سیٹنگز',
@@ -445,7 +664,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'set.auto_print': 'آٹو پرنٹ',
     'set.auto_print_desc': 'سیل سیو ہوتے ہی بِل پرنٹ',
     'set.cloud_backup': 'کلاؤڈ بیک اپ (Supabase)',
-    'set.cloud_desc': 'Supabase سے کنیکٹ کریں تاکہ آپ کا ڈیٹا آن لائن محفوظ رہے',
+    'set.cloud_desc': 'Supabase سے کنیکٹ کریں تاکہ آپ کا ڈیٹا آن لائن محفوظ رہے۔ کمپیوٹر خراب ہونے پر ڈیٹا محفوظ رہے گا۔',
     'set.supabase_url': 'Supabase URL',
     'set.supabase_key': 'Supabase Key',
     'set.sync_now': 'ابھی سنک کریں',
@@ -453,6 +672,20 @@ export const translations: Record<Lang, Record<string, string>> = {
     'set.architecture': 'سسٹم آرکیٹیکچر',
     'set.save_settings': 'سیٹنگز محفوظ',
     'set.saving': 'محفوظ ہو رہا ہے...',
+    'set.saved': 'سیٹنگز محفوظ',
+    'set.sync_coming': 'سنک فیچر جلد فعال ہوگا',
+    'set.arch_desc': 'یہ سسٹم جدید ٹیکنالوجی پر بنایا گیا ہے:',
+    'set.arch_frontend': 'فرنٹ اینڈ',
+    'set.arch_db': 'ڈیٹابیس',
+    'set.arch_cloud': 'کلاؤڈ',
+    'set.arch_barcode': 'بارکوڈ',
+    'set.arch_source': 'سورس کوڈ',
+    'set.arch_backup': 'بیک اپ',
+    'set.update': 'آٹو اپڈیٹ',
+    'set.update_desc': 'سافٹ وئر آٹو اپڈیٹ ہوتا ہے۔ ڈیٹا کبھی ضائع نہیں ہوتا۔',
+    'set.check_update': 'اپڈیٹ چیک کریں',
+    'set.up_to_date': 'سافٹ وئر اپ ڈیٹ ہے',
+    'set.version': 'ورژن',
 
     // Network
     'net.title': 'نیٹ ورک شیئرنگ',
@@ -463,6 +696,24 @@ export const translations: Record<Lang, Record<string, string>> = {
     'net.this_device': 'یہ ڈیوائس',
     'net.sync_active': 'لائیو سنک فعال',
     'net.room_code': 'روم کوڈ',
+    'net.start_sharing': 'شیئرنگ شروع کریں',
+    'net.disconnect': 'ڈسکنیکٹ',
+    'net.room_desc': 'یہ کوڈ دوسرے کمپیوٹرز پر بھی استعمال کریں تاکہ وہ اس سسٹم سے کنیکٹ ہوں',
+    'net.note': 'نوٹ: نیٹ ورک شیئرنگ کے لیے تمام کمپیوٹرز ایک ہی WiFi نیٹ ورک پر ہونے چاہیئں۔ WebSocket سے لائیو ڈیٹا سینک ہوگا۔',
+
+    // Reports
+    'rpt.title': 'ریپورٹس',
+    'rpt.coming_soon': 'ریپورٹس سیکشن جلد مکمل ہوگا۔ فی الحال ڈیش بورڈ پر بنیادی اعداد و شمار دستیاب ہیں۔',
+    'rpt.sales_report': 'فروخت کی رپورٹس',
+    'rpt.purchase_report': 'خریداری کی رپورٹس',
+    'rpt.stock_report': 'اسٹاک کی تفصیلات',
+    'rpt.profit_report': 'منافع کی رپورٹس',
+    'rpt.expense_report': 'اخراجات کی رپورٹس',
+    'rpt.sales_desc': 'دن، ہفتہ، مہینہ وار فروخت',
+    'rpt.purchase_desc': 'پارٹی وار، دن وار خریداری',
+    'rpt.stock_desc': 'گروپ وار، کمپنی وار اسٹاک',
+    'rpt.profit_desc': 'دن وار، انوائس وار منافع',
+    'rpt.expense_desc': 'ٹائپ وار، دن وار اخراجات',
 
     // Common
     'common.save': 'محفوظ',
@@ -474,6 +725,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'common.delete': 'حذف',
     'common.actions': 'عملیات',
     'common.currency': 'Rs',
+    'common.name': 'نام',
   },
 };
 

@@ -16,7 +16,10 @@ export async function POST(request: NextRequest) {
     }
     await db.user.update({ where: { id: user.id }, data: { lastLogin: new Date() } });
     const { password: _, ...safeUser } = user;
-    return NextResponse.json({ user: safeUser, token: Buffer.from(`${user.id}:${Date.now()}`).toString('base64') });
+    return NextResponse.json({
+      user: safeUser,
+      token: Buffer.from(`${user.id}:${Date.now()}`).toString('base64')
+    });
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json({ error: 'Server error', detail: String(error) }, { status: 500 });

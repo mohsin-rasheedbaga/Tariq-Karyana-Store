@@ -10,15 +10,16 @@ datasource db {
 // ========== MASTER DATA ==========
 
 model User {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  password  String
-  fullName  String
-  role      String   @default("cashier") // admin, cashier, viewer
-  isActive  Boolean  @default(true)
-  lastLogin DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  username    String   @unique
+  password    String
+  fullName    String
+  role        String   @default("cashier") // admin, cashier, viewer
+  permissions String   @default("{}")       // JSON: {"dashboard":true,"sales":true,...}
+  isActive    Boolean  @default(true)
+  lastLogin   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model ProductCategory {

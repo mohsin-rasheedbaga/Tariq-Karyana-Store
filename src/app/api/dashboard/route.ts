@@ -69,14 +69,23 @@ export async function GET() {
     // Today's expenses
     const todayExpensesResult = await db.expense.aggregate({
       _sum: { amount: true },
-      where: {
-        createdAt: {
-          gte: todayStart,
-          lte: todayEnd,
-        },
-      },
+      where: { createdAt: { gte: todayStart, lte: todayEnd } },
     });
     const totalExpenses = todayExpensesResult._sum.amount || 0;
+
+    // Total stock value
+    const allProducts = await db.product.findMany({ where: { isActive: true }, select: { stock: true, purchasePrice: true } });
+    const totalStockValue = allProducts.reduce((sum, p) => sum + (p.stock * p.purchasePrice), 0);
+
+    // Today's profit (sale total - cost of items sold today)
+    const todaySalesItems = await db.saleItem.findMany({
+      where: { sale: { createdAt: { gte: todayStart, lte: todayEnd } } },
+      include: { product: { select: { purchasePrice: true } } },
+    });
+    const todayCost = todaySalesItems.reduce((sum, item) => {
+      return sum + (item.quantity * (item.product?.purchasePrice || 0));
+    }, 0);
+    const todayProfit = todaySales - todayCost;
 
     return NextResponse.json({
       todaySales,
@@ -86,6 +95,8 @@ export async function GET() {
       lowStockProducts,
       recentSales,
       totalExpenses,
+      totalStockValue,
+      todayProfit,
     });
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
