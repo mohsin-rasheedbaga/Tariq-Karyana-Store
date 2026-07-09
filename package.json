@@ -1,6 +1,6 @@
 {
   "name": "tariq-karyana-store",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Tariq Karyana Store - POS System with Customer Card System",
   "main": "dist-electron/main.js",
@@ -119,7 +119,6 @@
     },
     "files": [
       "dist-electron/**/*",
-      ".next/standalone/**/*",
       "public/**/*",
       "prisma/**/*"
     ],
@@ -130,18 +129,14 @@
       },
       {
         "from": "node_modules/.prisma",
-        "to": "node_modules/.prisma"
+        "to": "standalone/node_modules/.prisma"
       },
       {
         "from": "node_modules/@prisma",
-        "to": "node_modules/@prisma"
+        "to": "standalone/node_modules/@prisma"
       }
     ],
     "asar": true,
-    "asarUnpack": [
-      "node_modules/.prisma/**/*",
-      "node_modules/@prisma/**/*"
-    ],
     "win": {
       "target": [
         {
