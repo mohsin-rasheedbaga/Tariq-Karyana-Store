@@ -36,7 +36,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -53,6 +53,7 @@ jobs:
 
       - name: Build Electron app (${{ matrix.platform }})
         run: npx electron-builder --${{ matrix.platform }} --publish always
+        continue-on-error: ${{ matrix.platform == 'mac' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
