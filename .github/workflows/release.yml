@@ -5,11 +5,6 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version (e.g. 1.0.1)'
-        required: true
-        default: '1.0.1'
 
 permissions:
   contents: write
@@ -57,59 +52,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload artifacts
+      - name: Upload installer artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.platform }}
-          path: release/
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.AppImage
+            release/*.deb
+            release/*.yml
+            release/*.blockmap
           retention-days: 30
-
-  create-release:
-    needs: build-and-release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: all-artifacts/
-
-      - name: List all built files
-        run: find all-artifacts/ -type f -name "*.exe" -o -name "*.dmg" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.yml" -o -name "*.blockmap" | sort
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: "Tariq Karyana Store v${{ github.ref_name }}"
-          body: |
-            ## Tariq Karyana Store - POS System
-
-            ### Downloads:
-            - **Windows**: `.exe` installer and portable version
-            - **Linux**: `.AppImage` and `.deb` packages
-            - **macOS**: `.dmg` installer
-
-            ### Features:
-            - Full POS System with barcode support
-            - Customer Card System
-            - Inventory Management
-            - Sales & Purchase Tracking
-            - Expense Management
-            - Reports & Dashboard
-            - Auto-update with delta updates (only changed files download)
-
-            ### Installation:
-            1. Download the installer for your platform
-            2. Run the installer
-            3. App will auto-check for updates on startup
-
-            > **Note**: Your data is stored in the app data directory and is preserved across updates.
-          draft: false
-          prerelease: false
-          files: |
-            all-artifacts/**
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          if-no-files-found: ignore
