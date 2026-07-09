@@ -22,6 +22,8 @@ db/
 *.tsbuildinfo
 dist/
 build/
+dist-electron/
+release/
 
 # OS
 .DS_Store

@@ -1,0 +1,114 @@
+name: Build & Release Desktop App
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.0.1)'
+        required: true
+        default: '1.0.1'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+          - os: ubuntu-latest
+            platform: linux
+          - os: macos-latest
+            platform: mac
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build Next.js (standalone)
+        run: npm run build
+
+      - name: Compile Electron main process
+        run: npx tsc -p electron/tsconfig.json
+
+      - name: Build Electron app (${{ matrix.platform }})
+        run: npx electron-builder --${{ matrix.platform }} --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}
+          path: release/
+          retention-days: 30
+
+  create-release:
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-artifacts/
+
+      - name: List all built files
+        run: find all-artifacts/ -type f -name "*.exe" -o -name "*.dmg" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.yml" -o -name "*.blockmap" | sort
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Tariq Karyana Store v${{ github.ref_name }}"
+          body: |
+            ## Tariq Karyana Store - POS System
+
+            ### Downloads:
+            - **Windows**: `.exe` installer and portable version
+            - **Linux**: `.AppImage` and `.deb` packages
+            - **macOS**: `.dmg` installer
+
+            ### Features:
+            - Full POS System with barcode support
+            - Customer Card System
+            - Inventory Management
+            - Sales & Purchase Tracking
+            - Expense Management
+            - Reports & Dashboard
+            - Auto-update with delta updates (only changed files download)
+
+            ### Installation:
+            1. Download the installer for your platform
+            2. Run the installer
+            3. App will auto-check for updates on startup
+
+            > **Note**: Your data is stored in the app data directory and is preserved across updates.
+          draft: false
+          prerelease: false
+          files: |
+            all-artifacts/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
