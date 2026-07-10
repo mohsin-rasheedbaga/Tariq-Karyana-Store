@@ -1,2 +1,11 @@
 skills/
 node_modules/
+.next/
+dist-electron/
+release/
+upload/
+db/
+*.db
+*.log
+.env
+.dev.vars
