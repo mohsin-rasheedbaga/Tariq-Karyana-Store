@@ -97,6 +97,8 @@ function stripUnnecessaryFiles(dirPath) {
       const fullPath = path.join(dirPath, entry.name);
       // Never touch native binary directories
       if (entry.name === '.prisma' || entry.name === 'prebuilds' || entry.name === 'prebuild-install') continue;
+      // Never strip @swc - Next.js runtime depends on it
+      if (entry.name === '@swc') continue;
       if (entry.isDirectory()) {
         if (UNNECESSARY_DIRS.includes(entry.name)) {
           try { fs.rmSync(fullPath, { recursive: true, force: true }); } catch {}
@@ -303,13 +305,33 @@ for (const dep of runtimeDeps) {
 }
 console.log(`  Copied ${copiedCount} missing runtime deps.\n`);
 
-// Step 4: Copy known Next.js sub-dependencies
+// Step 4b: Copy Next.js nested dependencies (e.g. @swc/helpers inside next/node_modules/)
+// Next.js bundles some deps inside its own node_modules. These must be hoisted to
+// top-level standalone node_modules for Electron's child process to resolve them.
+console.log('[4b/7] Hoisting Next.js nested dependencies...');
+const nextPkgNm = path.join(standaloneNm, 'next', 'node_modules');
+if (fs.existsSync(nextPkgNm)) {
+  for (const entry of fs.readdirSync(nextPkgNm, { withFileTypes: true })) {
+    const srcNested = path.join(nextPkgNm, entry.name);
+    const destTop = path.join(standaloneNm, entry.name);
+    if (!fs.existsSync(destTop)) {
+      console.log(`  Hoisting: ${entry.name} (from next/node_modules/)`);
+      copyDirSync(srcNested, destTop);
+    }
+  }
+} else {
+  console.log('  WARNING: next/node_modules/ not found in standalone!');
+}
+console.log('');
+
+// Step 4c: Copy known Next.js sub-dependencies
 const knownNextSubDeps = [
   'styled-jsx', 'postcss', 'autoprefixer', 'cssnano', 'nanoid',
   'picocolors', 'ansi-styles', 'color-convert', 'color-name',
   'has-flag', 'supports-color', 'chalk', 'optimism',
+  '@swc/helpers',
 ];
-console.log('[4b/7] Checking known Next.js sub-dependencies...');
+console.log('[4c/7] Checking known Next.js sub-dependencies...');
 for (const dep of knownNextSubDeps) {
   const srcPath = path.join(projectNm, dep);
   const destPath = path.join(standaloneNm, dep);
@@ -350,6 +372,7 @@ const checks = [
   ['@prisma/client', path.join(standaloneNm, '@prisma', 'client')],
   ['.prisma/client', path.join(standaloneNm, '.prisma', 'client')],
   ['.next/static', path.join(standaloneDir, '.next', 'static')],
+  ['@swc/helpers', path.join(standaloneNm, '@swc', 'helpers')],
   ['public/', path.join(standaloneDir, 'public')],
 ];
 

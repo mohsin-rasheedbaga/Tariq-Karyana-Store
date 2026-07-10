@@ -1,0 +1,489 @@
+     1→✅ build-and-release (ubuntu-latest, linux): completed/success
+     2→✅ build-and-release (macos-latest, mac): completed/success
+     3→✅ build-and-release (windows-latest, win): completed/success
+     4→❌ create-release: completed/failure
+     5→---
+     6→Release: v1.0.0 - 1.0.0
+     7→URL: https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/tag/untagged-036b3839d8bc73c2609b
+     8→Draft: True | Prerelease: False
+     9→
+    10→  📦 af.pak (536KB)
+    11→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/af.pak
+    12→  📦 alert.60ea9f84.svg (0KB)
+    13→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/alert.60ea9f84.svg
+    14→  📦 array.1a36c222.svg (0KB)
+    15→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/array.1a36c222.svg
+    16→  📦 assertNodeAPISupported.js (1KB)
+    17→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/assertNodeAPISupported.js
+    18→  📦 bg.pak (991KB)
+    19→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/bg.pak
+    20→  📦 binary.js (658KB)
+    21→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/binary.js
+    22→  📦 binary.js.map (2MB)
+    23→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/binary.js.map
+    24→  📦 binary.mjs (656KB)
+    25→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/binary.mjs
+    26→  📦 binaryTargetRegex.js (1KB)
+    27→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/binaryTargetRegex.js
+    28→  📦 binaryTargets.d.ts (0KB)
+    29→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/binaryTargets.d.ts
+    30→  📦 binaryTargets.js (1KB)
+    31→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/binaryTargets.js
+    32→  📦 BinaryType.d.ts (0KB)
+    33→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/BinaryType.d.ts
+    34→  📦 BinaryType.js (1KB)
+    35→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/BinaryType.js
+    36→  📦 boolean.9188b434.svg (0KB)
+    37→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/boolean.9188b434.svg
+    38→  📦 BruteForceBackend.hh (0KB)
+    39→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/BruteForceBackend.hh
+    40→  📦 BSER.hh (1KB)
+    41→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/BSER.hh
+    42→  📦 chrome_100_percent.pak (92KB)
+    43→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chrome_100_percent.pak
+    44→  📦 chrome_200_percent.pak (145KB)
+    45→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chrome_200_percent.pak
+    46→  📦 chunk-2ESYSVXG.js (3KB)
+    47→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-2ESYSVXG.js
+    48→  📦 chunk-2U36ISZO.js (1KB)
+    49→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-2U36ISZO.js
+    50→  📦 chunk-3UEKS5W6.js (504KB)
+    51→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-3UEKS5W6.js
+    52→  📦 chunk-3VVCXIQ5.js (2KB)
+    53→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-3VVCXIQ5.js
+    54→  📦 chunk-4C3J5AMP.js (83KB)
+    55→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-4C3J5AMP.js
+    56→  📦 chunk-6HZWON4S.js (0KB)
+    57→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-6HZWON4S.js
+    58→  📦 chunk-7JLQJWOR.js (1KB)
+    59→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-7JLQJWOR.js
+    60→  📦 chunk-7MLUNQIZ.js (1KB)
+    61→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-7MLUNQIZ.js
+    62→  📦 chunk-CY52DY2B.js (388KB)
+    63→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-CY52DY2B.js
+    64→  📦 chunk-FKGWOTGU.js (1KB)
+    65→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-FKGWOTGU.js
+    66→  📦 chunk-FSAAZH62.js (6KB)
+    67→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-FSAAZH62.js
+    68→  📦 chunk-FWMN4WME.js (1KB)
+    69→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-FWMN4WME.js
+    70→  📦 chunk-IPLRRT6O.js (2KB)
+    71→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-IPLRRT6O.js
+    72→  📦 chunk-J5S3UHYB.js (83KB)
+    73→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-J5S3UHYB.js
+    74→  📦 chunk-M5T7GI2R.js (15KB)
+    75→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-M5T7GI2R.js
+    76→  📦 chunk-MWVY55RY.js (5KB)
+    77→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-MWVY55RY.js
+    78→  📦 chunk-QFA3XBMW.js (5KB)
+    79→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-QFA3XBMW.js
+    80→  📦 chunk-QGM4M3NI.js (2KB)
+    81→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-QGM4M3NI.js
+    82→  📦 chunk-RXM4EBGR.js (178KB)
+    83→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-RXM4EBGR.js
+    84→  📦 chunk-VAPNG6TS.js (55KB)
+    85→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-VAPNG6TS.js
+    86→  📦 chunk-YVXCXD3A.js (2KB)
+    87→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/chunk-YVXCXD3A.js
+    88→  📦 CL.write.1.tlog (5KB)
+    89→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/CL.write.1.tlog
+    90→  📦 cleanupCache.d.ts (0KB)
+    91→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/cleanupCache.d.ts
+    92→  📦 cleanupCache.js (1KB)
+    93→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/cleanupCache.js
+    94→  📦 client.js (224KB)
+    95→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/client.js
+    96→  📦 client.js.map (1MB)
+    97→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/client.js.map
+    98→  📦 client.mjs (223KB)
+    99→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/client.mjs
+   100→  📦 client.mjs.map (1MB)
+   101→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/client.mjs.map
+   102→  📦 colors.js (5KB)
+   103→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/colors.js
+   104→  📦 cross.c2610cf5.svg (0KB)
+   105→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/cross.c2610cf5.svg
+   106→  📦 cs.pak (622KB)
+   107→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/cs.pak
+   108→  📦 d3dcompiler_47.dll (4MB)
+   109→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/d3dcompiler_47.dll
+   110→  📦 da.pak (562KB)
+   111→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/da.pak
+   112→  📦 databrowser.html (0KB)
+   113→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/databrowser.html
+   114→  📦 databrowser.js (0KB)
+   115→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/databrowser.js
+   116→  📦 datetime.a3bf710a.svg (0KB)
+   117→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/datetime.a3bf710a.svg
+   118→  📦 Debounce.hh (0KB)
+   119→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Debounce.hh
+   120→  📦 default.js (0KB)
+   121→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/default.js
+   122→  📦 DirTree.hh (1KB)
+   123→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/DirTree.hh
+   124→  📦 download.8d34b65a.svg (0KB)
+   125→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/download.8d34b65a.svg
+   126→  📦 download.js (1KB)
+   127→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/download.js
+   128→  📦 downloadZip.d.ts (0KB)
+   129→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/downloadZip.d.ts
+   130→  📦 downloadZip.js (1KB)
+   131→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/downloadZip.js
+   132→  📦 edge-esm.js (166KB)
+   133→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/edge-esm.js
+   134→  📦 edge-esm.js.map (815KB)
+   135→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/edge-esm.js.map
+   136→  📦 edge.js (0KB)
+   137→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/edge.js
+   138→  📦 Electron (16KB)
+   139→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Electron
+   140→  📦 Electron.Helper (39KB)
+   141→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Electron.Helper
+   142→  📦 Electron.Helper.GPU (39KB)
+   143→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Electron.Helper.GPU
+   144→  📦 Electron.Helper.Renderer (39KB)
+   145→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Electron.Helper.Renderer
+   146→  📦 enum.7ec0b64c.svg (0KB)
+   147→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/enum.7ec0b64c.svg
+   148→  📦 env.js (1KB)
+   149→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/env.js
+   150→  📦 Event.hh (2KB)
+   151→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Event.hh
+   152→  📦 extension.js (0KB)
+   153→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/extension.js
+   154→  📦 favicon.svg (0KB)
+   155→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/favicon.svg
+   156→  📦 fi.pak (550KB)
+   157→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/fi.pak
+   158→  📦 fil.pak (623KB)
+   159→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/fil.pak
+   160→  📦 folder.d77b8eaf.svg (0KB)
+   161→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/folder.d77b8eaf.svg
+   162→  📦 FSEventsBackend.hh (0KB)
+   163→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/FSEventsBackend.hh
+   164→  📦 getHash.js (1KB)
+   165→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/getHash.js
+   166→  📦 getNodeAPIName.js (1KB)
+   167→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/getNodeAPIName.js
+   168→  📦 getPlatform.d.ts (4KB)
+   169→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/getPlatform.d.ts
+   170→  📦 getPlatform.js (1KB)
+   171→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/getPlatform.js
+   172→  📦 getProxyAgent.js (1KB)
+   173→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/getProxyAgent.js
+   174→  📦 hamburger.5fdadeac.svg (0KB)
+   175→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/hamburger.5fdadeac.svg
+   176→  📦 he.pak (777KB)
+   177→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/he.pak
+   178→  📦 icudtl.dat (9MB)
+   179→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/icudtl.dat
+   180→  📦 include.h (3KB)
+   181→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/include.h
+   182→  📦 index-browser.d.mts (11KB)
+   183→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/index-browser.d.mts
+   184→  📦 index-browser.js (0KB)
+   185→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/index-browser.js
+   186→  📦 index-browser.js.map (205KB)
+   187→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/index-browser.js.map
+   188→  📦 index-browser.mjs (34KB)
+   189→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/index-browser.mjs
+   190→  📦 index-browser.mjs.map (204KB)
+   191→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/index-browser.mjs.map
+   192→  📦 index.d.mts (1KB)
+   193→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/index.d.mts
+   194→  📦 index.d.ts (0KB)
+   195→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/index.d.ts
+   196→  📦 index.js (0KB)
+   197→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/index.js
+   198→  📦 index.mjs (6KB)
+   199→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/index.mjs
+   200→  📦 Info.plist (0KB)
+   201→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Info.plist
+   202→  📦 inter-all-600-normal.d0a7c8a9.woff (128KB)
+   203→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-all-600-normal.d0a7c8a9.woff
+   204→  📦 inter-cyrillic-400-normal.ac97a49e.woff2 (6KB)
+   205→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-cyrillic-400-normal.ac97a49e.woff2
+   206→  📦 inter-cyrillic-600-normal.2c917f10.woff2 (6KB)
+   207→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-cyrillic-600-normal.2c917f10.woff2
+   208→  📦 inter-cyrillic-ext-400-normal.f21a6a97.woff2 (9KB)
+   209→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-cyrillic-ext-400-normal.f21a6a97.woff2
+   210→  📦 inter-cyrillic-ext-600-normal.bb31f197.woff2 (10KB)
+   211→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-cyrillic-ext-600-normal.bb31f197.woff2
+   212→  📦 inter-greek-400-normal.e9163df8.woff2 (8KB)
+   213→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-greek-400-normal.e9163df8.woff2
+   214→  📦 inter-greek-600-normal.e644d70f.woff2 (8KB)
+   215→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-greek-600-normal.e644d70f.woff2
+   216→  📦 inter-greek-ext-600-normal.7f437016.woff2 (5KB)
+   217→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-greek-ext-600-normal.7f437016.woff2
+   218→  📦 inter-latin-400-normal.27ae72da.woff2 (16KB)
+   219→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-latin-400-normal.27ae72da.woff2
+   220→  📦 inter-latin-600-normal.87d718a2.woff2 (17KB)
+   221→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-latin-600-normal.87d718a2.woff2
+   222→  📦 inter-latin-ext-400-normal.5b02c69a.woff2 (21KB)
+   223→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-latin-ext-400-normal.5b02c69a.woff2
+   224→  📦 inter-vietnamese-600-normal.8185dacd.woff2 (4KB)
+   225→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/inter-vietnamese-600-normal.8185dacd.woff2
+   226→  📦 jestSnapshotSerializer.js (6KB)
+   227→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/jestSnapshotSerializer.js
+   228→  📦 jetbrains-mono-all-400-normal.f86807b7.woff (48KB)
+   229→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/jetbrains-mono-all-400-normal.f86807b7.woff
+   230→  📦 jetbrains-mono-cyrillic-400-normal.1ae57fe2.woff2 (4KB)
+   231→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/jetbrains-mono-cyrillic-400-normal.1ae57fe2.woff2
+   232→  📦 jetbrains-mono-latin-ext-400-normal.6315c53c.woff2 (5KB)
+   233→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/jetbrains-mono-latin-ext-400-normal.6315c53c.woff2
+   234→  📦 KqueueBackend.hh (0KB)
+   235→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/KqueueBackend.hh
+   236→  📦 libGLESv2.dll (7MB)
+   237→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/libGLESv2.dll
+   238→  📦 libquery_engine-darwin-arm64.dylib.node (18MB)
+   239→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/libquery_engine-darwin-arm64.dylib.node
+   240→  📦 library.js (197KB)
+   241→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/library.js
+   242→  📦 library.js.map (991KB)
+   243→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/library.js.map
+   244→  📦 library.mjs (197KB)
+   245→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/library.mjs
+   246→  📦 library.mjs.map (987KB)
+   247→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/library.mjs.map
+   248→  📦 LICENSE (11KB)
+   249→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/LICENSE
+   250→  📦 LICENSES.chromium.html (11MB)
+   251→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/LICENSES.chromium.html
+   252→  📦 link.d.ts (0KB)
+   253→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/link.d.ts
+   254→  📦 link.js (1KB)
+   255→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/link.js
+   256→  📦 link.read.1.tlog (10KB)
+   257→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/link.read.1.tlog
+   258→  📦 locale.pak (1MB)
+   259→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/locale.pak
+   260→  📦 localinstall.d.ts (0KB)
+   261→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/localinstall.d.ts
+   262→  📦 localinstall.js (66KB)
+   263→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/localinstall.js
+   264→  📦 log.d.ts (0KB)
+   265→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/log.d.ts
+   266→  📦 logger.d.ts (0KB)
+   267→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/logger.d.ts
+   268→  📦 logo.svg (1KB)
+   269→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/logo.svg
+   270→  📦 logotype.a960b169.svg (12KB)
+   271→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/logotype.a960b169.svg
+   272→  📦 magic-string.es-3WRPFX2A.js (41KB)
+   273→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/magic-string.es-3WRPFX2A.js
+   274→  📦 MainMenu.nib (1KB)
+   275→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/MainMenu.nib
+   276→  📦 Mantle (66KB)
+   277→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Mantle
+   278→  📦 maximize.ce1a88fc.svg (0KB)
+   279→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/maximize.ce1a88fc.svg
+   280→  📦 minimize.23fe727a.svg (0KB)
+   281→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/minimize.23fe727a.svg
+   282→  📦 moon.387ab66c.svg (0KB)
+   283→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/moon.387ab66c.svg
+   284→  📦 multipart-parser-ASKQAOL4.js (10KB)
+   285→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/multipart-parser-ASKQAOL4.js
+   286→  📦 next-swc.darwin-arm64.node (98MB)
+   287→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/next-swc.darwin-arm64.node
+   288→  📦 next-swc.win32-x64-msvc.node (119MB)
+   289→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/next-swc.win32-x64-msvc.node
+   290→  📦 nl.pak (560KB)
+   291→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/nl.pak
+   292→  📦 number.85ddf96b.svg (1KB)
+   293→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/number.85ddf96b.svg
+   294→  📦 object.0ba944a6.svg (0KB)
+   295→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/object.0ba944a6.svg
+   296→  📦 package.json (0KB)
+   297→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/package.json
+   298→  📦 panel-left.a81e4b97.svg (0KB)
+   299→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/panel-left.a81e4b97.svg
+   300→  📦 PkgInfo (0KB)
+   301→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/PkgInfo
+   302→  📦 plus.8fbf7ad3.svg (0KB)
+   303→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/plus.8fbf7ad3.svg
+   304→  📦 postinstall.js (12KB)
+   305→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/postinstall.js
+   306→  📦 preinstall-entry.js (0KB)
+   307→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/preinstall-entry.js
+   308→  📦 query_compiler_bg.cockroachdb.js (10KB)
+   309→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.cockroachdb.js
+   310→  📦 query_compiler_bg.cockroachdb.mjs (8KB)
+   311→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.cockroachdb.mjs
+   312→  📦 query_compiler_bg.cockroachdb.wasm-base64.mjs (2MB)
+   313→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.cockroachdb.wasm-base64.mjs
+   314→  📦 query_compiler_bg.mysql.js (10KB)
+   315→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.mysql.js
+   316→  📦 query_compiler_bg.mysql.mjs (8KB)
+   317→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.mysql.mjs
+   318→  📦 query_compiler_bg.mysql.wasm (1MB)
+   319→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.mysql.wasm
+   320→  📦 query_compiler_bg.mysql.wasm-base64.mjs (2MB)
+   321→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.mysql.wasm-base64.mjs
+   322→  📦 query_compiler_bg.postgresql.js (10KB)
+   323→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.postgresql.js
+   324→  📦 query_compiler_bg.postgresql.wasm (1MB)
+   325→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.postgresql.wasm
+   326→  📦 query_compiler_bg.postgresql.wasm-base64.js (2MB)
+   327→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.postgresql.wasm-base64.js
+   328→  📦 query_compiler_bg.postgresql.wasm-base64.mjs (2MB)
+   329→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.postgresql.wasm-base64.mjs
+   330→  📦 query_compiler_bg.sqlite.js (10KB)
+   331→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.sqlite.js
+   332→  📦 query_compiler_bg.sqlite.mjs (8KB)
+   333→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.sqlite.mjs
+   334→  📦 query_compiler_bg.sqlite.wasm-base64.mjs (2MB)
+   335→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.sqlite.wasm-base64.mjs
+   336→  📦 query_compiler_bg.sqlserver.js (10KB)
+   337→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.sqlserver.js
+   338→  📦 query_compiler_bg.sqlserver.mjs (8KB)
+   339→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.sqlserver.mjs
+   340→  📦 query_compiler_bg.sqlserver.wasm (1MB)
+   341→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_compiler_bg.sqlserver.wasm
+   342→  📦 query_engine-windows.dll.node (20MB)
+   343→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine-windows.dll.node
+   344→  📦 query_engine_bg.cockroachdb.js (16KB)
+   345→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.cockroachdb.js
+   346→  📦 query_engine_bg.cockroachdb.mjs (12KB)
+   347→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.cockroachdb.mjs
+   348→  📦 query_engine_bg.cockroachdb.wasm (2MB)
+   349→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.cockroachdb.wasm
+   350→  📦 query_engine_bg.cockroachdb.wasm-base64.mjs (2MB)
+   351→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.cockroachdb.wasm-base64.mjs
+   352→  📦 query_engine_bg.mysql.js (16KB)
+   353→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.mysql.js
+   354→  📦 query_engine_bg.mysql.mjs (12KB)
+   355→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.mysql.mjs
+   356→  📦 query_engine_bg.mysql.wasm (2MB)
+   357→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.mysql.wasm
+   358→  📦 query_engine_bg.mysql.wasm-base64.js (2MB)
+   359→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.mysql.wasm-base64.js
+   360→  📦 query_engine_bg.mysql.wasm-base64.mjs (2MB)
+   361→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.mysql.wasm-base64.mjs
+   362→  📦 query_engine_bg.postgresql.js (16KB)
+   363→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.postgresql.js
+   364→  📦 query_engine_bg.postgresql.mjs (12KB)
+   365→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.postgresql.mjs
+   366→  📦 query_engine_bg.postgresql.wasm (2MB)
+   367→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.postgresql.wasm
+   368→  📦 query_engine_bg.postgresql.wasm-base64.js (2MB)
+   369→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.postgresql.wasm-base64.js
+   370→  📦 query_engine_bg.postgresql.wasm-base64.mjs (2MB)
+   371→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.postgresql.wasm-base64.mjs
+   372→  📦 query_engine_bg.sqlite.js (16KB)
+   373→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.sqlite.js
+   374→  📦 query_engine_bg.sqlite.mjs (12KB)
+   375→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.sqlite.mjs
+   376→  📦 query_engine_bg.sqlite.wasm-base64.js (2MB)
+   377→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.sqlite.wasm-base64.js
+   378→  📦 query_engine_bg.sqlite.wasm-base64.mjs (2MB)
+   379→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.sqlite.wasm-base64.mjs
+   380→  📦 query_engine_bg.sqlserver.js (16KB)
+   381→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.sqlserver.js
+   382→  📦 query_engine_bg.sqlserver.mjs (12KB)
+   383→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.sqlserver.mjs
+   384→  📦 query_engine_bg.sqlserver.wasm-base64.js (2MB)
+   385→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.sqlserver.wasm-base64.js
+   386→  📦 query_engine_bg.sqlserver.wasm-base64.mjs (2MB)
+   387→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/query_engine_bg.sqlserver.wasm-base64.mjs
+   388→  📦 react-native.js (178KB)
+   389→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/react-native.js
+   390→  📦 react-native.js.map (839KB)
+   391→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/react-native.js.map
+   392→  📦 ReactiveObjC (353KB)
+   393→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/ReactiveObjC
+   394→  📦 README.md (0KB)
+   395→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/README.md
+   396→  📦 refresh.d5448ccc.svg (0KB)
+   397→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/refresh.d5448ccc.svg
+   398→  📦 schema-engine-darwin-arm64 (20MB)
+   399→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/schema-engine-darwin-arm64
+   400→  📦 schema_engine_bg.wasm (3MB)
+   401→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/schema_engine_bg.wasm
+   402→  📦 search.2ed766ce.svg (0KB)
+   403→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/search.2ed766ce.svg
+   404→  📦 server.js (3KB)
+   405→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/server.js
+   406→  📦 settings.5ad25af2.svg (20KB)
+   407→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/settings.5ad25af2.svg
+   408→  📦 Signal.hh (0KB)
+   409→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Signal.hh
+   410→  📦 splash.html (0KB)
+   411→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/splash.html
+   412→  📦 splash.js (0KB)
+   413→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/splash.js
+   414→  📦 sql.js (0KB)
+   415→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/sql.js
+   416→  📦 Squirrel (117KB)
+   417→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Squirrel
+   418→  📦 sun.89774753.svg (0KB)
+   419→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/sun.89774753.svg
+   420→  📦 swc.darwin-arm64.node (21MB)
+   421→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/swc.darwin-arm64.node
+   422→  📦 Tariq-Karyana-Store-1.0.0.AppImage (343MB)
+   423→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Tariq-Karyana-Store-1.0.0.AppImage
+   424→  📦 Tariq-Karyana-Store-1.0.0.deb (280MB)
+   425→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Tariq-Karyana-Store-1.0.0.deb
+   426→  📦 Tariq-Karyana-Store-Portable-1.0.0.exe (319MB)
+   427→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Tariq-Karyana-Store-Portable-1.0.0.exe
+   428→  📦 Tariq-Karyana-Store-Setup-1.0.0.exe (319MB)
+   429→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Tariq-Karyana-Store-Setup-1.0.0.exe
+   430→  📦 Tariq-Karyana-Store-Setup-1.0.0.exe.blockmap (294KB)
+   431→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Tariq-Karyana-Store-Setup-1.0.0.exe.blockmap
+   432→  📦 Tariq.Karyana.Store.exe (191MB)
+   433→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/Tariq.Karyana.Store.exe
+   434→  📦 te.pak (1MB)
+   435→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/te.pak
+   436→  📦 th.pak (1MB)
+   437→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/th.pak
+   438→  📦 tick-indeterminate.aec8a44d.svg (0KB)
+   439→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/tick-indeterminate.aec8a44d.svg
+   440→  📦 tick.8cbb6a93.svg (0KB)
+   441→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/tick.8cbb6a93.svg
+   442→  📦 tr.pak (584KB)
+   443→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/tr.pak
+   444→  📦 util.d.ts (0KB)
+   445→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/util.d.ts
+   446→  📦 utils.js (1KB)
+   447→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/utils.js
+   448→  📦 v8_context_snapshot.x86_64.bin (685KB)
+   449→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/v8_context_snapshot.x86_64.bin
+   450→  📦 vendor.js (1MB)
+   451→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/vendor.js
+   452→  📦 versions.json (0KB)
+   453→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/versions.json
+   454→  📦 vitestContext.d.ts (6KB)
+   455→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/vitestContext.d.ts
+   456→  📦 vitestContext.js (601KB)
+   457→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/vitestContext.js
+   458→  📦 vk_swiftshader.dll (5MB)
+   459→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/vk_swiftshader.dll
+   460→  📦 vk_swiftshader_icd.json (0KB)
+   461→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/vk_swiftshader_icd.json
+   462→  📦 wasm-compiler-edge.js (202KB)
+   463→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/wasm-compiler-edge.js
+   464→  📦 wasm-compiler-edge.js.map (984KB)
+   465→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/wasm-compiler-edge.js.map
+   466→  📦 wasm-compiler-edge.mjs.map (983KB)
+   467→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/wasm-compiler-edge.mjs.map
+   468→  📦 wasm-engine-edge.d.ts (0KB)
+   469→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/wasm-engine-edge.d.ts
+   470→  📦 wasm-engine-edge.mjs (143KB)
+   471→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/wasm-engine-edge.mjs
+   472→  📦 wasm-engine-edge.mjs.map (729KB)
+   473→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/wasm-engine-edge.mjs.map
+   474→  📦 wasm.js (0KB)
+   475→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/wasm.js
+   476→  📦 WasmBackend.hh (0KB)
+   477→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/WasmBackend.hh
+   478→  📦 watcher.lastbuildstate (0KB)
+   479→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/watcher.lastbuildstate
+   480→  📦 watcher.lib (2KB)
+   481→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/watcher.lib
+   482→  📦 watcher.node (318KB)
+   483→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/watcher.node
+   484→  📦 watcher.node.recipe (0KB)
+   485→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/watcher.node.recipe
+   486→  📦 WatchmanBackend.hh (0KB)
+   487→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/WatchmanBackend.hh
+   488→  📦 xdg-open (25KB)
+   489→     https://github.com/mohsin-rasheedbaga/Tariq-Karyana-Store/releases/download/untagged-036b3839d8bc73c2609b/xdg-open

@@ -1,0 +1,630 @@
+     1→"use strict";
+     2→Object.defineProperty(exports, "__esModule", {
+     3→    value: true
+     4→});
+     5→0 && (module.exports = {
+     6→    configSchema: null,
+     7→    experimentalSchema: null
+     8→});
+     9→function _export(target, all) {
+    10→    for(var name in all)Object.defineProperty(target, name, {
+    11→        enumerable: true,
+    12→        get: all[name]
+    13→    });
+    14→}
+    15→_export(exports, {
+    16→    configSchema: function() {
+    17→        return configSchema;
+    18→    },
+    19→    experimentalSchema: function() {
+    20→        return experimentalSchema;
+    21→    }
+    22→});
+    23→const _imageconfig = require("../shared/lib/image-config");
+    24→const _zod = require("next/dist/compiled/zod");
+    25→const _nexttest = require("../cli/next-test");
+    26→// A custom zod schema for the SizeLimit type
+    27→const zSizeLimit = _zod.z.custom((val)=>{
+    28→    if (typeof val === 'number' || typeof val === 'string') {
+    29→        return true;
+    30→    }
+    31→    return false;
+    32→});
+    33→const zExportMap = _zod.z.record(_zod.z.string(), _zod.z.object({
+    34→    page: _zod.z.string(),
+    35→    query: _zod.z.any(),
+    36→    // private optional properties
+    37→    _fallbackRouteParams: _zod.z.array(_zod.z.any()).optional(),
+    38→    _isAppDir: _zod.z.boolean().optional(),
+    39→    _isDynamicError: _zod.z.boolean().optional(),
+    40→    _isRoutePPREnabled: _zod.z.boolean().optional(),
+    41→    _allowEmptyStaticShell: _zod.z.boolean().optional()
+    42→}));
+    43→const zRouteHas = _zod.z.union([
+    44→    _zod.z.object({
+    45→        type: _zod.z.enum([
+    46→            'header',
+    47→            'query',
+    48→            'cookie'
+    49→        ]),
+    50→        key: _zod.z.string(),
+    51→        value: _zod.z.string().optional()
+    52→    }),
+    53→    _zod.z.object({
+    54→        type: _zod.z.literal('host'),
+    55→        key: _zod.z.undefined().optional(),
+    56→        value: _zod.z.string()
+    57→    })
+    58→]);
+    59→const zRewrite = _zod.z.object({
+    60→    source: _zod.z.string(),
+    61→    destination: _zod.z.string(),
+    62→    basePath: _zod.z.literal(false).optional(),
+    63→    locale: _zod.z.literal(false).optional(),
+    64→    has: _zod.z.array(zRouteHas).optional(),
+    65→    missing: _zod.z.array(zRouteHas).optional(),
+    66→    internal: _zod.z.boolean().optional()
+    67→});
+    68→const zRedirect = _zod.z.object({
+    69→    source: _zod.z.string(),
+    70→    destination: _zod.z.string(),
+    71→    basePath: _zod.z.literal(false).optional(),
+    72→    locale: _zod.z.literal(false).optional(),
+    73→    has: _zod.z.array(zRouteHas).optional(),
+    74→    missing: _zod.z.array(zRouteHas).optional(),
+    75→    internal: _zod.z.boolean().optional()
+    76→}).and(_zod.z.union([
+    77→    _zod.z.object({
+    78→        statusCode: _zod.z.never().optional(),
+    79→        permanent: _zod.z.boolean()
+    80→    }),
+    81→    _zod.z.object({
+    82→        statusCode: _zod.z.number(),
+    83→        permanent: _zod.z.never().optional()
+    84→    })
+    85→]));
+    86→const zHeader = _zod.z.object({
+    87→    source: _zod.z.string(),
+    88→    basePath: _zod.z.literal(false).optional(),
+    89→    locale: _zod.z.literal(false).optional(),
+    90→    headers: _zod.z.array(_zod.z.object({
+    91→        key: _zod.z.string(),
+    92→        value: _zod.z.string()
+    93→    })),
+    94→    has: _zod.z.array(zRouteHas).optional(),
+    95→    missing: _zod.z.array(zRouteHas).optional(),
+    96→    internal: _zod.z.boolean().optional()
+    97→});
+    98→const zTurbopackLoaderItem = _zod.z.union([
+    99→    _zod.z.string(),
+   100→    _zod.z.strictObject({
+   101→        loader: _zod.z.string(),
+   102→        // Any JSON value can be used as turbo loader options, so use z.any() here
+   103→        options: _zod.z.record(_zod.z.string(), _zod.z.any()).optional()
+   104→    })
+   105→]);
+   106→const zTurbopackLoaderBuiltinCondition = _zod.z.union([
+   107→    _zod.z.literal('browser'),
+   108→    _zod.z.literal('foreign'),
+   109→    _zod.z.literal('development'),
+   110→    _zod.z.literal('production'),
+   111→    _zod.z.literal('node'),
+   112→    _zod.z.literal('edge-light')
+   113→]);
+   114→const zTurbopackCondition = _zod.z.union([
+   115→    _zod.z.strictObject({
+   116→        all: _zod.z.lazy(()=>_zod.z.array(zTurbopackCondition))
+   117→    }),
+   118→    _zod.z.strictObject({
+   119→        any: _zod.z.lazy(()=>_zod.z.array(zTurbopackCondition))
+   120→    }),
+   121→    _zod.z.strictObject({
+   122→        not: _zod.z.lazy(()=>zTurbopackCondition)
+   123→    }),
+   124→    zTurbopackLoaderBuiltinCondition,
+   125→    _zod.z.strictObject({
+   126→        path: _zod.z.union([
+   127→            _zod.z.string(),
+   128→            _zod.z.instanceof(RegExp)
+   129→        ]).optional(),
+   130→        content: _zod.z.instanceof(RegExp).optional()
+   131→    })
+   132→]);
+   133→const zTurbopackRuleConfigItem = _zod.z.strictObject({
+   134→    loaders: _zod.z.array(zTurbopackLoaderItem),
+   135→    as: _zod.z.string().optional(),
+   136→    condition: zTurbopackCondition.optional()
+   137→});
+   138→const zTurbopackRuleConfigCollection = _zod.z.union([
+   139→    zTurbopackRuleConfigItem,
+   140→    _zod.z.array(_zod.z.union([
+   141→        zTurbopackLoaderItem,
+   142→        zTurbopackRuleConfigItem
+   143→    ]))
+   144→]);
+   145→const zTurbopackConfig = _zod.z.strictObject({
+   146→    rules: _zod.z.record(_zod.z.string(), zTurbopackRuleConfigCollection).optional(),
+   147→    resolveAlias: _zod.z.record(_zod.z.string(), _zod.z.union([
+   148→        _zod.z.string(),
+   149→        _zod.z.array(_zod.z.string()),
+   150→        _zod.z.record(_zod.z.string(), _zod.z.union([
+   151→            _zod.z.string(),
+   152→            _zod.z.array(_zod.z.string())
+   153→        ]))
+   154→    ])).optional(),
+   155→    resolveExtensions: _zod.z.array(_zod.z.string()).optional(),
+   156→    root: _zod.z.string().optional(),
+   157→    debugIds: _zod.z.boolean().optional()
+   158→});
+   159→const experimentalSchema = {
+   160→    adapterPath: _zod.z.string().optional(),
+   161→    useSkewCookie: _zod.z.boolean().optional(),
+   162→    after: _zod.z.boolean().optional(),
+   163→    appNavFailHandling: _zod.z.boolean().optional(),
+   164→    preloadEntriesOnStart: _zod.z.boolean().optional(),
+   165→    allowedRevalidateHeaderKeys: _zod.z.array(_zod.z.string()).optional(),
+   166→    staleTimes: _zod.z.object({
+   167→        dynamic: _zod.z.number().optional(),
+   168→        static: _zod.z.number().gte(30).optional()
+   169→    }).optional(),
+   170→    cacheLife: _zod.z.record(_zod.z.object({
+   171→        stale: _zod.z.number().optional(),
+   172→        revalidate: _zod.z.number().optional(),
+   173→        expire: _zod.z.number().optional()
+   174→    })).optional(),
+   175→    cacheHandlers: _zod.z.record(_zod.z.string(), _zod.z.string().optional()).optional(),
+   176→    clientRouterFilter: _zod.z.boolean().optional(),
+   177→    clientRouterFilterRedirects: _zod.z.boolean().optional(),
+   178→    clientRouterFilterAllowedRate: _zod.z.number().optional(),
+   179→    cpus: _zod.z.number().optional(),
+   180→    memoryBasedWorkersCount: _zod.z.boolean().optional(),
+   181→    craCompat: _zod.z.boolean().optional(),
+   182→    caseSensitiveRoutes: _zod.z.boolean().optional(),
+   183→    clientParamParsingOrigins: _zod.z.array(_zod.z.string()).optional(),
+   184→    dynamicOnHover: _zod.z.boolean().optional(),
+   185→    disableOptimizedLoading: _zod.z.boolean().optional(),
+   186→    disablePostcssPresetEnv: _zod.z.boolean().optional(),
+   187→    cacheComponents: _zod.z.boolean().optional(),
+   188→    inlineCss: _zod.z.boolean().optional(),
+   189→    esmExternals: _zod.z.union([
+   190→        _zod.z.boolean(),
+   191→        _zod.z.literal('loose')
+   192→    ]).optional(),
+   193→    serverActions: _zod.z.object({
+   194→        bodySizeLimit: zSizeLimit.optional(),
+   195→        allowedOrigins: _zod.z.array(_zod.z.string()).optional()
+   196→    }).optional(),
+   197→    // The original type was Record<string, any>
+   198→    extensionAlias: _zod.z.record(_zod.z.string(), _zod.z.any()).optional(),
+   199→    externalDir: _zod.z.boolean().optional(),
+   200→    externalMiddlewareRewritesResolve: _zod.z.boolean().optional(),
+   201→    externalProxyRewritesResolve: _zod.z.boolean().optional(),
+   202→    fallbackNodePolyfills: _zod.z.literal(false).optional(),
+   203→    fetchCacheKeyPrefix: _zod.z.string().optional(),
+   204→    forceSwcTransforms: _zod.z.boolean().optional(),
+   205→    fullySpecified: _zod.z.boolean().optional(),
+   206→    gzipSize: _zod.z.boolean().optional(),
+   207→    imgOptConcurrency: _zod.z.number().int().optional().nullable(),
+   208→    imgOptTimeoutInSeconds: _zod.z.number().int().optional(),
+   209→    imgOptMaxInputPixels: _zod.z.number().int().optional(),
+   210→    imgOptSequentialRead: _zod.z.boolean().optional().nullable(),
+   211→    imgOptSkipMetadata: _zod.z.boolean().optional().nullable(),
+   212→    isrFlushToDisk: _zod.z.boolean().optional(),
+   213→    largePageDataBytes: _zod.z.number().optional(),
+   214→    linkNoTouchStart: _zod.z.boolean().optional(),
+   215→    manualClientBasePath: _zod.z.boolean().optional(),
+   216→    middlewarePrefetch: _zod.z.enum([
+   217→        'strict',
+   218→        'flexible'
+   219→    ]).optional(),
+   220→    proxyPrefetch: _zod.z.enum([
+   221→        'strict',
+   222→        'flexible'
+   223→    ]).optional(),
+   224→    middlewareClientMaxBodySize: zSizeLimit.optional(),
+   225→    proxyClientMaxBodySize: zSizeLimit.optional(),
+   226→    multiZoneDraftMode: _zod.z.boolean().optional(),
+   227→    cssChunking: _zod.z.union([
+   228→        _zod.z.boolean(),
+   229→        _zod.z.literal('strict')
+   230→    ]).optional(),
+   231→    nextScriptWorkers: _zod.z.boolean().optional(),
+   232→    // The critter option is unknown, use z.any() here
+   233→    optimizeCss: _zod.z.union([
+   234→        _zod.z.boolean(),
+   235→        _zod.z.any()
+   236→    ]).optional(),
+   237→    optimisticClientCache: _zod.z.boolean().optional(),
+   238→    parallelServerCompiles: _zod.z.boolean().optional(),
+   239→    parallelServerBuildTraces: _zod.z.boolean().optional(),
+   240→    ppr: _zod.z.union([
+   241→        _zod.z.boolean(),
+   242→        _zod.z.literal('incremental')
+   243→    ]).readonly().optional(),
+   244→    taint: _zod.z.boolean().optional(),
+   245→    prerenderEarlyExit: _zod.z.boolean().optional(),
+   246→    proxyTimeout: _zod.z.number().gte(0).optional(),
+   247→    rootParams: _zod.z.boolean().optional(),
+   248→    isolatedDevBuild: _zod.z.boolean().optional(),
+   249→    mcpServer: _zod.z.boolean().optional(),
+   250→    removeUncaughtErrorAndRejectionListeners: _zod.z.boolean().optional(),
+   251→    validateRSCRequestHeaders: _zod.z.boolean().optional(),
+   252→    scrollRestoration: _zod.z.boolean().optional(),
+   253→    sri: _zod.z.object({
+   254→        algorithm: _zod.z.enum([
+   255→            'sha256',
+   256→            'sha384',
+   257→            'sha512'
+   258→        ]).optional()
+   259→    }).optional(),
+   260→    swcPlugins: _zod.z// The specific swc plugin's option is unknown, use z.any() here
+   261→    .array(_zod.z.tuple([
+   262→        _zod.z.string(),
+   263→        _zod.z.record(_zod.z.string(), _zod.z.any())
+   264→    ])).optional(),
+   265→    swcTraceProfiling: _zod.z.boolean().optional(),
+   266→    // NonNullable<webpack.Configuration['experiments']>['buildHttp']
+   267→    urlImports: _zod.z.any().optional(),
+   268→    viewTransition: _zod.z.boolean().optional(),
+   269→    workerThreads: _zod.z.boolean().optional(),
+   270→    webVitalsAttribution: _zod.z.array(_zod.z.union([
+   271→        _zod.z.literal('CLS'),
+   272→        _zod.z.literal('FCP'),
+   273→        _zod.z.literal('FID'),
+   274→        _zod.z.literal('INP'),
+   275→        _zod.z.literal('LCP'),
+   276→        _zod.z.literal('TTFB')
+   277→    ])).optional(),
+   278→    // This is partial set of mdx-rs transform options we support, aligned
+   279→    // with next_core::next_config::MdxRsOptions. Ensure both types are kept in sync.
+   280→    mdxRs: _zod.z.union([
+   281→        _zod.z.boolean(),
+   282→        _zod.z.object({
+   283→            development: _zod.z.boolean().optional(),
+   284→            jsxRuntime: _zod.z.string().optional(),
+   285→            jsxImportSource: _zod.z.string().optional(),
+   286→            providerImportSource: _zod.z.string().optional(),
+   287→            mdxType: _zod.z.enum([
+   288→                'gfm',
+   289→                'commonmark'
+   290→            ]).optional()
+   291→        })
+   292→    ]).optional(),
+   293→    transitionIndicator: _zod.z.boolean().optional(),
+   294→    typedRoutes: _zod.z.boolean().optional(),
+   295→    webpackBuildWorker: _zod.z.boolean().optional(),
+   296→    webpackMemoryOptimizations: _zod.z.boolean().optional(),
+   297→    turbopackMemoryLimit: _zod.z.number().optional(),
+   298→    turbopackMinify: _zod.z.boolean().optional(),
+   299→    turbopackFileSystemCacheForDev: _zod.z.boolean().optional(),
+   300→    turbopackFileSystemCacheForBuild: _zod.z.boolean().optional(),
+   301→    turbopackSourceMaps: _zod.z.boolean().optional(),
+   302→    turbopackInputSourceMaps: _zod.z.boolean().optional(),
+   303→    turbopackTreeShaking: _zod.z.boolean().optional(),
+   304→    turbopackRemoveUnusedImports: _zod.z.boolean().optional(),
+   305→    turbopackRemoveUnusedExports: _zod.z.boolean().optional(),
+   306→    turbopackScopeHoisting: _zod.z.boolean().optional(),
+   307→    turbopackClientSideNestedAsyncChunking: _zod.z.boolean().optional(),
+   308→    turbopackServerSideNestedAsyncChunking: _zod.z.boolean().optional(),
+   309→    turbopackImportTypeBytes: _zod.z.boolean().optional(),
+   310→    turbopackUseSystemTlsCerts: _zod.z.boolean().optional(),
+   311→    turbopackUseBuiltinBabel: _zod.z.boolean().optional(),
+   312→    turbopackUseBuiltinSass: _zod.z.boolean().optional(),
+   313→    turbopackModuleIds: _zod.z.enum([
+   314→        'named',
+   315→        'deterministic'
+   316→    ]).optional(),
+   317→    turbopackInferModuleSideEffects: _zod.z.boolean().optional(),
+   318→    optimizePackageImports: _zod.z.array(_zod.z.string()).optional(),
+   319→    optimizeServerReact: _zod.z.boolean().optional(),
+   320→    clientTraceMetadata: _zod.z.array(_zod.z.string()).optional(),
+   321→    serverMinification: _zod.z.boolean().optional(),
+   322→    serverSourceMaps: _zod.z.boolean().optional(),
+   323→    useWasmBinary: _zod.z.boolean().optional(),
+   324→    useLightningcss: _zod.z.boolean().optional(),
+   325→    testProxy: _zod.z.boolean().optional(),
+   326→    defaultTestRunner: _zod.z.enum(_nexttest.SUPPORTED_TEST_RUNNERS_LIST).optional(),
+   327→    allowDevelopmentBuild: _zod.z.literal(true).optional(),
+   328→    reactDebugChannel: _zod.z.boolean().optional(),
+   329→    staticGenerationRetryCount: _zod.z.number().int().optional(),
+   330→    staticGenerationMaxConcurrency: _zod.z.number().int().optional(),
+   331→    staticGenerationMinPagesPerWorker: _zod.z.number().int().optional(),
+   332→    typedEnv: _zod.z.boolean().optional(),
+   333→    serverComponentsHmrCache: _zod.z.boolean().optional(),
+   334→    authInterrupts: _zod.z.boolean().optional(),
+   335→    useCache: _zod.z.boolean().optional(),
+   336→    slowModuleDetection: _zod.z.object({
+   337→        buildTimeThresholdMs: _zod.z.number().int()
+   338→    }).optional(),
+   339→    globalNotFound: _zod.z.boolean().optional(),
+   340→    browserDebugInfoInTerminal: _zod.z.union([
+   341→        _zod.z.boolean(),
+   342→        _zod.z.object({
+   343→            depthLimit: _zod.z.number().int().positive().optional(),
+   344→            edgeLimit: _zod.z.number().int().positive().optional(),
+   345→            showSourceLocation: _zod.z.boolean().optional()
+   346→        })
+   347→    ]).optional(),
+   348→    lockDistDir: _zod.z.boolean().optional(),
+   349→    hideLogsAfterAbort: _zod.z.boolean().optional(),
+   350→    runtimeServerDeploymentId: _zod.z.boolean().optional()
+   351→};
+   352→const configSchema = _zod.z.lazy(()=>_zod.z.strictObject({
+   353→        allowedDevOrigins: _zod.z.array(_zod.z.string()).optional(),
+   354→        assetPrefix: _zod.z.string().optional(),
+   355→        basePath: _zod.z.string().optional(),
+   356→        bundlePagesRouterDependencies: _zod.z.boolean().optional(),
+   357→        cacheComponents: _zod.z.boolean().optional(),
+   358→        cacheHandler: _zod.z.string().min(1).optional(),
+   359→        cacheHandlers: _zod.z.record(_zod.z.string(), _zod.z.string().optional()).optional(),
+   360→        cacheLife: _zod.z.record(_zod.z.object({
+   361→            stale: _zod.z.number().optional(),
+   362→            revalidate: _zod.z.number().optional(),
+   363→            expire: _zod.z.number().optional()
+   364→        })).optional(),
+   365→        cacheMaxMemorySize: _zod.z.number().optional(),
+   366→        cleanDistDir: _zod.z.boolean().optional(),
+   367→        compiler: _zod.z.strictObject({
+   368→            emotion: _zod.z.union([
+   369→                _zod.z.boolean(),
+   370→                _zod.z.object({
+   371→                    sourceMap: _zod.z.boolean().optional(),
+   372→                    autoLabel: _zod.z.union([
+   373→                        _zod.z.literal('always'),
+   374→                        _zod.z.literal('dev-only'),
+   375→                        _zod.z.literal('never')
+   376→                    ]).optional(),
+   377→                    labelFormat: _zod.z.string().min(1).optional(),
+   378→                    importMap: _zod.z.record(_zod.z.string(), _zod.z.record(_zod.z.string(), _zod.z.object({
+   379→                        canonicalImport: _zod.z.tuple([
+   380→                            _zod.z.string(),
+   381→                            _zod.z.string()
+   382→                        ]).optional(),
+   383→                        styledBaseImport: _zod.z.tuple([
+   384→                            _zod.z.string(),
+   385→                            _zod.z.string()
+   386→                        ]).optional()
+   387→                    }))).optional()
+   388→                })
+   389→            ]).optional(),
+   390→            reactRemoveProperties: _zod.z.union([
+   391→                _zod.z.boolean().optional(),
+   392→                _zod.z.object({
+   393→                    properties: _zod.z.array(_zod.z.string()).optional()
+   394→                })
+   395→            ]).optional(),
+   396→            relay: _zod.z.object({
+   397→                src: _zod.z.string(),
+   398→                artifactDirectory: _zod.z.string().optional(),
+   399→                language: _zod.z.enum([
+   400→                    'javascript',
+   401→                    'typescript',
+   402→                    'flow'
+   403→                ]).optional(),
+   404→                eagerEsModules: _zod.z.boolean().optional()
+   405→            }).optional(),
+   406→            removeConsole: _zod.z.union([
+   407→                _zod.z.boolean().optional(),
+   408→                _zod.z.object({
+   409→                    exclude: _zod.z.array(_zod.z.string()).min(1).optional()
+   410→                })
+   411→            ]).optional(),
+   412→            styledComponents: _zod.z.union([
+   413→                _zod.z.boolean().optional(),
+   414→                _zod.z.object({
+   415→                    displayName: _zod.z.boolean().optional(),
+   416→                    topLevelImportPaths: _zod.z.array(_zod.z.string()).optional(),
+   417→                    ssr: _zod.z.boolean().optional(),
+   418→                    fileName: _zod.z.boolean().optional(),
+   419→                    meaninglessFileNames: _zod.z.array(_zod.z.string()).optional(),
+   420→                    minify: _zod.z.boolean().optional(),
+   421→                    transpileTemplateLiterals: _zod.z.boolean().optional(),
+   422→                    namespace: _zod.z.string().min(1).optional(),
+   423→                    pure: _zod.z.boolean().optional(),
+   424→                    cssProp: _zod.z.boolean().optional()
+   425→                })
+   426→            ]),
+   427→            styledJsx: _zod.z.union([
+   428→                _zod.z.boolean().optional(),
+   429→                _zod.z.object({
+   430→                    useLightningcss: _zod.z.boolean().optional()
+   431→                })
+   432→            ]),
+   433→            define: _zod.z.record(_zod.z.string(), _zod.z.string()).optional(),
+   434→            defineServer: _zod.z.record(_zod.z.string(), _zod.z.string()).optional(),
+   435→            runAfterProductionCompile: _zod.z.function().returns(_zod.z.promise(_zod.z.void())).optional()
+   436→        }).optional(),
+   437→        compress: _zod.z.boolean().optional(),
+   438→        configOrigin: _zod.z.string().optional(),
+   439→        crossOrigin: _zod.z.union([
+   440→            _zod.z.literal('anonymous'),
+   441→            _zod.z.literal('use-credentials')
+   442→        ]).optional(),
+   443→        deploymentId: _zod.z.string().optional(),
+   444→        devIndicators: _zod.z.union([
+   445→            _zod.z.object({
+   446→                position: _zod.z.union([
+   447→                    _zod.z.literal('bottom-left'),
+   448→                    _zod.z.literal('bottom-right'),
+   449→                    _zod.z.literal('top-left'),
+   450→                    _zod.z.literal('top-right')
+   451→                ]).optional()
+   452→            }),
+   453→            _zod.z.literal(false)
+   454→        ]).optional(),
+   455→        distDir: _zod.z.string().min(1).optional(),
+   456→        env: _zod.z.record(_zod.z.string(), _zod.z.union([
+   457→            _zod.z.string(),
+   458→            _zod.z.undefined()
+   459→        ])).optional(),
+   460→        enablePrerenderSourceMaps: _zod.z.boolean().optional(),
+   461→        excludeDefaultMomentLocales: _zod.z.boolean().optional(),
+   462→        experimental: _zod.z.strictObject(experimentalSchema).optional(),
+   463→        exportPathMap: _zod.z.function().args(zExportMap, _zod.z.object({
+   464→            dev: _zod.z.boolean(),
+   465→            dir: _zod.z.string(),
+   466→            outDir: _zod.z.string().nullable(),
+   467→            distDir: _zod.z.string(),
+   468→            buildId: _zod.z.string()
+   469→        })).returns(_zod.z.union([
+   470→            zExportMap,
+   471→            _zod.z.promise(zExportMap)
+   472→        ])).optional(),
+   473→        generateBuildId: _zod.z.function().args().returns(_zod.z.union([
+   474→            _zod.z.string(),
+   475→            _zod.z.null(),
+   476→            _zod.z.promise(_zod.z.union([
+   477→                _zod.z.string(),
+   478→                _zod.z.null()
+   479→            ]))
+   480→        ])).optional(),
+   481→        generateEtags: _zod.z.boolean().optional(),
+   482→        headers: _zod.z.function().args().returns(_zod.z.promise(_zod.z.array(zHeader))).optional(),
+   483→        htmlLimitedBots: _zod.z.instanceof(RegExp).optional(),
+   484→        httpAgentOptions: _zod.z.strictObject({
+   485→            keepAlive: _zod.z.boolean().optional()
+   486→        }).optional(),
+   487→        i18n: _zod.z.strictObject({
+   488→            defaultLocale: _zod.z.string().min(1),
+   489→            domains: _zod.z.array(_zod.z.strictObject({
+   490→                defaultLocale: _zod.z.string().min(1),
+   491→                domain: _zod.z.string().min(1),
+   492→                http: _zod.z.literal(true).optional(),
+   493→                locales: _zod.z.array(_zod.z.string().min(1)).optional()
+   494→            })).optional(),
+   495→            localeDetection: _zod.z.literal(false).optional(),
+   496→            locales: _zod.z.array(_zod.z.string().min(1))
+   497→        }).nullable().optional(),
+   498→        images: _zod.z.strictObject({
+   499→            localPatterns: _zod.z.array(_zod.z.strictObject({
+   500→                pathname: _zod.z.string().optional(),
+   501→                search: _zod.z.string().optional()
+   502→            })).max(25).optional(),
+   503→            remotePatterns: _zod.z.array(_zod.z.union([
+   504→                _zod.z.instanceof(URL),
+   505→                _zod.z.strictObject({
+   506→                    hostname: _zod.z.string(),
+   507→                    pathname: _zod.z.string().optional(),
+   508→                    port: _zod.z.string().max(5).optional(),
+   509→                    protocol: _zod.z.enum([
+   510→                        'http',
+   511→                        'https'
+   512→                    ]).optional(),
+   513→                    search: _zod.z.string().optional()
+   514→                })
+   515→            ])).max(50).optional(),
+   516→            unoptimized: _zod.z.boolean().optional(),
+   517→            contentSecurityPolicy: _zod.z.string().optional(),
+   518→            contentDispositionType: _zod.z.enum([
+   519→                'inline',
+   520→                'attachment'
+   521→            ]).optional(),
+   522→            dangerouslyAllowSVG: _zod.z.boolean().optional(),
+   523→            dangerouslyAllowLocalIP: _zod.z.boolean().optional(),
+   524→            deviceSizes: _zod.z.array(_zod.z.number().int().gte(1).lte(10000)).max(25).optional(),
+   525→            disableStaticImages: _zod.z.boolean().optional(),
+   526→            domains: _zod.z.array(_zod.z.string()).max(50).optional(),
+   527→            formats: _zod.z.array(_zod.z.enum([
+   528→                'image/avif',
+   529→                'image/webp'
+   530→            ])).max(4).optional(),
+   531→            imageSizes: _zod.z.array(_zod.z.number().int().gte(1).lte(10000)).min(0).max(25).optional(),
+   532→            loader: _zod.z.enum(_imageconfig.VALID_LOADERS).optional(),
+   533→            loaderFile: _zod.z.string().optional(),
+   534→            maximumRedirects: _zod.z.number().int().min(0).max(20).optional(),
+   535→            minimumCacheTTL: _zod.z.number().int().gte(0).optional(),
+   536→            path: _zod.z.string().optional(),
+   537→            qualities: _zod.z.array(_zod.z.number().int().gte(1).lte(100)).min(1).max(20).optional()
+   538→        }).optional(),
+   539→        logging: _zod.z.union([
+   540→            _zod.z.object({
+   541→                fetches: _zod.z.object({
+   542→                    fullUrl: _zod.z.boolean().optional(),
+   543→                    hmrRefreshes: _zod.z.boolean().optional()
+   544→                }).optional(),
+   545→                incomingRequests: _zod.z.union([
+   546→                    _zod.z.boolean(),
+   547→                    _zod.z.object({
+   548→                        ignore: _zod.z.array(_zod.z.instanceof(RegExp))
+   549→                    })
+   550→                ]).optional()
+   551→            }),
+   552→            _zod.z.literal(false)
+   553→        ]).optional(),
+   554→        modularizeImports: _zod.z.record(_zod.z.string(), _zod.z.object({
+   555→            transform: _zod.z.union([
+   556→                _zod.z.string(),
+   557→                _zod.z.record(_zod.z.string(), _zod.z.string())
+   558→            ]),
+   559→            preventFullImport: _zod.z.boolean().optional(),
+   560→            skipDefaultConversion: _zod.z.boolean().optional()
+   561→        })).optional(),
+   562→        onDemandEntries: _zod.z.strictObject({
+   563→            maxInactiveAge: _zod.z.number().optional(),
+   564→            pagesBufferLength: _zod.z.number().optional()
+   565→        }).optional(),
+   566→        output: _zod.z.enum([
+   567→            'standalone',
+   568→            'export'
+   569→        ]).optional(),
+   570→        outputFileTracingRoot: _zod.z.string().optional(),
+   571→        outputFileTracingExcludes: _zod.z.record(_zod.z.string(), _zod.z.array(_zod.z.string())).optional(),
+   572→        outputFileTracingIncludes: _zod.z.record(_zod.z.string(), _zod.z.array(_zod.z.string())).optional(),
+   573→        pageExtensions: _zod.z.array(_zod.z.string()).min(1).optional(),
+   574→        poweredByHeader: _zod.z.boolean().optional(),
+   575→        productionBrowserSourceMaps: _zod.z.boolean().optional(),
+   576→        reactCompiler: _zod.z.union([
+   577→            _zod.z.boolean(),
+   578→            _zod.z.object({
+   579→                compilationMode: _zod.z.enum([
+   580→                    'infer',
+   581→                    'annotation',
+   582→                    'all'
+   583→                ]).optional(),
+   584→                panicThreshold: _zod.z.enum([
+   585→                    'none',
+   586→                    'critical_errors',
+   587→                    'all_errors'
+   588→                ]).optional()
+   589→            }).optional()
+   590→        ]),
+   591→        reactProductionProfiling: _zod.z.boolean().optional(),
+   592→        reactStrictMode: _zod.z.boolean().nullable().optional(),
+   593→        reactMaxHeadersLength: _zod.z.number().nonnegative().int().optional(),
+   594→        redirects: _zod.z.function().args().returns(_zod.z.promise(_zod.z.array(zRedirect))).optional(),
+   595→        rewrites: _zod.z.function().args().returns(_zod.z.promise(_zod.z.union([
+   596→            _zod.z.array(zRewrite),
+   597→            _zod.z.object({
+   598→                beforeFiles: _zod.z.array(zRewrite),
+   599→                afterFiles: _zod.z.array(zRewrite),
+   600→                fallback: _zod.z.array(zRewrite)
+   601→            })
+   602→        ]))).optional(),
+   603→        // sassOptions properties are unknown besides implementation, use z.any() here
+   604→        sassOptions: _zod.z.object({
+   605→            implementation: _zod.z.string().optional()
+   606→        }).catchall(_zod.z.any()).optional(),
+   607→        serverExternalPackages: _zod.z.array(_zod.z.string()).optional(),
+   608→        skipMiddlewareUrlNormalize: _zod.z.boolean().optional(),
+   609→        skipProxyUrlNormalize: _zod.z.boolean().optional(),
+   610→        skipTrailingSlashRedirect: _zod.z.boolean().optional(),
+   611→        staticPageGenerationTimeout: _zod.z.number().optional(),
+   612→        expireTime: _zod.z.number().optional(),
+   613→        target: _zod.z.string().optional(),
+   614→        trailingSlash: _zod.z.boolean().optional(),
+   615→        transpilePackages: _zod.z.array(_zod.z.string()).optional(),
+   616→        turbopack: zTurbopackConfig.optional(),
+   617→        typescript: _zod.z.strictObject({
+   618→            ignoreBuildErrors: _zod.z.boolean().optional(),
+   619→            tsconfigPath: _zod.z.string().min(1).optional()
+   620→        }).optional(),
+   621→        typedRoutes: _zod.z.boolean().optional(),
+   622→        useFileSystemPublicRoutes: _zod.z.boolean().optional(),
+   623→        // The webpack config type is unknown, use z.any() here
+   624→        webpack: _zod.z.any().nullable().optional(),
+   625→        watchOptions: _zod.z.strictObject({
+   626→            pollIntervalMs: _zod.z.number().positive().finite().optional()
+   627→        }).optional()
+   628→    }));
+   629→
+   630→//# sourceMappingURL=config-schema.js.map
