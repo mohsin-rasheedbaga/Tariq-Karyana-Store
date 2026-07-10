@@ -26,3 +26,14 @@ SyntaxError: /home/z/my-project/package.json (directory description file): Synta
     [2m[at /home/z/my-project/node_modules/enhanced-resolve/lib/DescriptionFileUtils.js:167:12][0m
     [2m[at /home/z/my-project/node_modules/enhanced-resolve/lib/forEachBail.js:39:13][0m
 ✓ Compiled in 663ms
+ GET / 200 in 69ms (compile: 8ms, render: 61ms)
+ GET / 200 in 30ms (compile: 3ms, render: 27ms)
+ GET / 200 in 50ms (compile: 5ms, render: 45ms)
+ GET / 200 in 31ms (compile: 3ms, render: 28ms)
+⚠ Cross origin request detected from preview-chat-20153ad9-fdf2-4685-8e19-216f844f6f12.space-z.ai to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ GET / 200 in 36ms (compile: 3ms, render: 33ms)
+ GET / 200 in 38ms (compile: 3ms, render: 35ms)
+ GET / 200 in 42ms (compile: 3ms, render: 39ms)
+ GET / 200 in 28ms (compile: 3ms, render: 25ms)
+ POST /api/auth/login 401 in 593ms (compile: 524ms, render: 69ms)
