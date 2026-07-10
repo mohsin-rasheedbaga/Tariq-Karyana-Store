@@ -1,26 +1,22 @@
 #!/usr/bin/env node
 /**
- * Cross-platform build script for Electron + Next.js standalone.
+ * Cross-platform build script for Electron + Next.js standalone (WINDOWS ONLY).
  *
- * After `next build`, the standalone dir has its OWN traced node_modules
- * (only what Next.js detected the app uses). But it sometimes misses
- * sub-dependencies (e.g. styled-jsx). So we ALSO copy our runtime
- * dependencies from project node_modules as a fallback.
- *
- * We ONLY copy packages listed in package.json "dependencies" (NOT
- * devDependencies like electron, eslint, typescript, etc.) to keep
- * the package small.
- *
- * Size optimization: strip .md, .ts, .map, tests, docs from node_modules.
+ * Size optimizations:
+ * - Only copies runtime deps (not devDependencies)
+ * - Strips non-Windows prebuilds from serialport/prisma
+ * - Strips .md, .ts, .map, tests, docs, examples
+ * - Removes source maps, TypeScript declarations
  */
 
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+// File patterns to delete
 const UNNECESSARY_PATTERNS = [
   '*.md', '*.MD',
-  '*.ts',
+  '*.ts', '*.tsx', '*.mts', '*.cts',
   '*.map',
   'LICENSE*', 'license*', 'LICENCE*', 'licence*',
   'AUTHORS*', 'CONTRIBUTORS*',
@@ -31,6 +27,18 @@ const UNNECESSARY_PATTERNS = [
   'docs', 'doc', 'example', 'examples', 'website',
   '.github', '.vscode', '.idea',
   'CHANGELOG*', 'HISTORY*', 'SECURITY*',
+  'README*', 'readme*', 'Readme*',
+  '.editorconfig', '.npmignore', '.gitignore',
+  'Makefile', 'Gulpfile*', 'Gruntfile*',
+  '*.tgz', '*.log',
+];
+
+// Directory names to delete entirely
+const UNNECESSARY_DIRS = [
+  '.git', '.cache', 'coverage', '__tests__', '__mocks__',
+  'docs', 'doc', 'example', 'examples', 'website',
+  '.github', '.vscode', '.idea', 'test', 'tests',
+  'typescript', 'ts', 'src', 'scripts',
 ];
 
 function shouldDelete(fileName) {
@@ -87,11 +95,10 @@ function stripUnnecessaryFiles(dirPath) {
   try {
     for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
       const fullPath = path.join(dirPath, entry.name);
-      if (entry.name === '.prisma') continue; // never touch native binaries
+      // Never touch native binary directories
+      if (entry.name === '.prisma' || entry.name === 'prebuilds' || entry.name === 'prebuild-install') continue;
       if (entry.isDirectory()) {
-        if (['.git', '.cache', 'coverage', '__tests__', '__mocks__',
-             'docs', 'doc', 'example', 'examples', 'website',
-             '.github', '.vscode', '.idea'].includes(entry.name)) {
+        if (UNNECESSARY_DIRS.includes(entry.name)) {
           try { fs.rmSync(fullPath, { recursive: true, force: true }); } catch {}
           continue;
         }
@@ -103,14 +110,121 @@ function stripUnnecessaryFiles(dirPath) {
   } catch {}
 }
 
+/**
+ * Remove non-Windows prebuilt binaries from serialport and other native modules.
+ * This is the BIGGEST size saver - serialport includes prebuilds for:
+ * - Windows x64, Windows arm64
+ * - Linux x64, Linux arm64, Linux armv7
+ * - macOS x64, macOS arm64
+ * We only need: Windows x64
+ */
+function stripNonWindowsBinaries(standaloneNm) {
+  console.log('  Stripping non-Windows native binaries...');
+  let savedBytes = 0;
+
+  // Walk through all packages looking for prebuilds directories
+  const walkDir = (dir) => {
+    try {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const fullPath = path.join(dir, entry.name);
+        if (!entry.isDirectory()) continue;
+
+        // Handle prebuilds directory (used by prebuild-install / @mapbox/node-pre-gyp)
+        if (entry.name === 'prebuilds') {
+          const platDir = path.join(fullPath);
+          try {
+            for (const plat of fs.readdirSync(platDir)) {
+              // Only keep 'win32-x64'
+              if (plat !== 'win32-x64') {
+                const platPath = path.join(platDir, plat);
+                const size = getDirSize(platPath);
+                if (size > 0) {
+                  savedBytes += size;
+                  fs.rmSync(platPath, { recursive: true, force: true });
+                  console.log(`    Removed prebuild: ${plat} (${formatSize(size)})`);
+                }
+              }
+            }
+          } catch {}
+          continue;
+        }
+
+        // Handle node-pre-gyp style directories (used by some older native modules)
+        if (entry.name === 'lib' || entry.name === 'binaries') {
+          const libDir = path.join(fullPath);
+          try {
+            for (const sub of fs.readdirSync(libDir, { withFileTypes: true })) {
+              if (sub.isDirectory()) {
+                const subPath = path.join(libDir, sub.name);
+                // Check if it's a platform-specific directory
+                if (sub.name.includes('linux') || sub.name.includes('darwin') ||
+                    sub.name.includes('macos') || sub.name.includes('arm64') ||
+                    sub.name.includes('armv') || sub.name.includes('musl')) {
+                  if (!sub.name.includes('win32') && !sub.name.includes('win')) {
+                    const size = getDirSize(subPath);
+                    if (size > 0) {
+                      savedBytes += size;
+                      fs.rmSync(subPath, { recursive: true, force: true });
+                    }
+                  }
+                }
+              }
+            }
+          } catch {}
+        }
+
+        // Recurse
+        walkDir(fullPath);
+      }
+    } catch {}
+  };
+
+  walkDir(standaloneNm);
+  console.log(`  Saved ${formatSize(savedBytes)} from non-Windows binaries`);
+  return savedBytes;
+}
+
+/**
+ * Remove non-Windows Prisma engine binaries
+ */
+function stripNonWindowsPrisma(standaloneNm) {
+  console.log('  Stripping non-Windows Prisma engines...');
+  let savedBytes = 0;
+
+  const prismaDirs = [
+    path.join(standaloneNm, '.prisma', 'client'),
+  ];
+
+  for (const dir of prismaDirs) {
+    if (!fs.existsSync(dir)) continue;
+    try {
+      for (const file of fs.readdirSync(dir)) {
+        // Prisma engines follow pattern: libquery_engine-OS-ARCH.node
+        // We want: libquery_engine-windows.dll.node (or similar)
+        // Remove: linux, darwin, macos, arm64 versions
+        const lower = file.toLowerCase();
+        if (lower.includes('linux') || lower.includes('darwin') ||
+            lower.includes('macos') || (lower.includes('arm64') && !lower.includes('windows'))) {
+          const filePath = path.join(dir, file);
+          const size = fs.statSync(filePath).size;
+          savedBytes += size;
+          fs.unlinkSync(filePath);
+          console.log(`    Removed: ${file} (${formatSize(size)})`);
+        }
+      }
+    } catch {}
+  }
+
+  console.log(`  Saved ${formatSize(savedBytes)} from non-Windows Prisma engines`);
+  return savedBytes;
+}
+
 function ensurePrismaInStandalone(standaloneDir, projectRoot) {
   console.log('  Copying Prisma engine...');
-  // Copy .prisma (generated client with native engine)
   const dotPrismaSrc = path.join(projectRoot, 'node_modules', '.prisma');
   if (fs.existsSync(dotPrismaSrc)) {
     copyDirSync(dotPrismaSrc, path.join(standaloneDir, 'node_modules', '.prisma'));
   }
-  // Copy @prisma scope
   const prismaScopeSrc = path.join(projectRoot, 'node_modules', '@prisma');
   if (fs.existsSync(prismaScopeSrc)) {
     for (const entry of fs.readdirSync(prismaScopeSrc, { withFileTypes: true })) {
@@ -121,12 +235,6 @@ function ensurePrismaInStandalone(standaloneDir, projectRoot) {
       }
     }
   }
-  // Verify
-  const engineDir = path.join(standaloneDir, 'node_modules', '.prisma', 'client');
-  if (fs.existsSync(engineDir)) {
-    const nodeFiles = fs.readdirSync(engineDir).filter(f => f.endsWith('.node'));
-    console.log(`  Engine binaries: ${nodeFiles.join(', ') || 'NONE (library mode?)'}`);
-  }
 }
 
 // ============================================================
@@ -136,13 +244,13 @@ const projectRoot = path.resolve(__dirname, '..');
 const standaloneDir = path.join(projectRoot, '.next', 'standalone');
 const pkg = require(path.join(projectRoot, 'package.json'));
 
-console.log('=== Building Next.js standalone for Electron ===');
+console.log('=== Building Next.js standalone for Electron (Windows) ===');
 console.log(`Project root: ${projectRoot}`);
 console.log(`Platform: ${process.platform} | Node: ${process.version}`);
 console.log('');
 
 // Step 1: next build
-console.log('[1/6] Running next build...');
+console.log('[1/7] Running next build...');
 try {
   execSync('npx next build', {
     cwd: projectRoot, stdio: 'inherit',
@@ -154,10 +262,10 @@ if (!fs.existsSync(standaloneDir)) {
   console.error('ERROR: .next/standalone not created.');
   process.exit(1);
 }
-console.log('[2/6] Build complete.\n');
+console.log('[2/7] Build complete.\n');
 
 // Step 2: Copy static assets
-console.log('[3/6] Copying static assets...');
+console.log('[3/7] Copying static assets...');
 const staticSrc = path.join(projectRoot, '.next', 'static');
 const staticDest = path.join(standaloneDir, '.next', 'static');
 if (fs.existsSync(staticSrc)) { copyDirSync(staticSrc, staticDest); console.log('  .next/static copied'); }
@@ -167,15 +275,16 @@ const publicDest = path.join(standaloneDir, 'public');
 if (fs.existsSync(publicSrc)) { copyDirSync(publicSrc, publicDest); console.log('  public/ copied'); }
 console.log('');
 
-// Step 3: Copy only RUNTIME dependencies (from package.json "dependencies")
-// into standalone node_modules. Skip devDependencies entirely.
-console.log('[4/6] Ensuring runtime dependencies in standalone...');
+// Step 3: Copy only RUNTIME dependencies
+console.log('[4/7] Ensuring runtime dependencies in standalone...');
 const standaloneNm = path.join(standaloneDir, 'node_modules');
 const projectNm = path.join(projectRoot, 'node_modules');
 
-// Get runtime dep names
-const runtimeDeps = Object.keys(pkg.dependencies || {});
-console.log(`  Runtime dependencies: ${runtimeDeps.length} packages`);
+const runtimeDeps = Object.keys(pkg.dependencies || {}).filter(dep =>
+  // Skip packages only used by Electron main process (not Next.js server)
+  !['serialport', 'electron-log', 'electron-updater'].includes(dep)
+);
+console.log(`  Runtime dependencies for standalone: ${runtimeDeps.length} packages (skipped: serialport, electron-log, electron-updater)`);
 
 let copiedCount = 0;
 for (const dep of runtimeDeps) {
@@ -194,14 +303,13 @@ for (const dep of runtimeDeps) {
 }
 console.log(`  Copied ${copiedCount} missing runtime deps.\n`);
 
-// Step 4: Also copy sub-deps that next relies on but standalone tracer may miss
-// These are known sub-dependencies of Next.js that may not be traced
+// Step 4: Copy known Next.js sub-dependencies
 const knownNextSubDeps = [
   'styled-jsx', 'postcss', 'autoprefixer', 'cssnano', 'nanoid',
   'picocolors', 'ansi-styles', 'color-convert', 'color-name',
   'has-flag', 'supports-color', 'chalk', 'optimism',
 ];
-console.log('[4b/6] Checking known Next.js sub-dependencies...');
+console.log('[4b/7] Checking known Next.js sub-dependencies...');
 for (const dep of knownNextSubDeps) {
   const srcPath = path.join(projectNm, dep);
   const destPath = path.join(standaloneNm, dep);
@@ -213,12 +321,18 @@ for (const dep of knownNextSubDeps) {
 console.log('');
 
 // Step 5: Prisma engine
-console.log('[5/6] Prisma engine files...');
+console.log('[5/7] Prisma engine files...');
 ensurePrismaInStandalone(standaloneDir, projectRoot);
 console.log('');
 
-// Step 6: Strip unnecessary files
-console.log('[6/6] Stripping unnecessary files...');
+// Step 6: Strip non-Windows binaries (BIGGEST size saver)
+console.log('[6/7] Stripping non-Windows native binaries...');
+stripNonWindowsBinaries(standaloneNm);
+stripNonWindowsPrisma(standaloneNm);
+console.log('');
+
+// Step 7: Strip unnecessary files
+console.log('[7/7] Stripping unnecessary files...');
 const nmBefore = getDirSize(standaloneNm);
 stripUnnecessaryFiles(standaloneNm);
 const nmAfter = getDirSize(standaloneNm);

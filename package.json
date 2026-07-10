@@ -1,6 +1,6 @@
 {
   "name": "tariq-karyana-store",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "private": true,
   "description": "Tariq Karyana Store - POS System with Customer Card System",
   "main": "dist-electron/main.js",
@@ -15,10 +15,8 @@
     "build:electron": "npm run build && tsc -p electron/tsconfig.json",
     "start": "NODE_ENV=production bun .next/standalone/server.js 2>&1 | tee server.log",
     "electron:dev": "npm run build:electron && electron .",
-    "electron:build": "npm run build:electron && electron-builder --publish always",
+    "electron:build": "npm run build:electron && electron-builder --win --publish always",
     "electron:build:win": "npm run build:electron && electron-builder --win --publish always",
-    "electron:build:linux": "npm run build:electron && electron-builder --linux --publish always",
-    "electron:build:mac": "npm run build:electron && electron-builder --mac --publish always",
     "lint": "eslint .",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
@@ -139,19 +137,14 @@
     "asarUnpack": [
       "node_modules/.prisma/**/*",
       "node_modules/serialport/**/*",
-      "node_modules/@serialport/**/*"
+      "node_modules/@serialport/**/*",
+      "node_modules/@node-serialport/**/*"
     ],
     "asar": true,
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "portable",
           "arch": [
             "x64"
           ]
@@ -174,52 +167,8 @@
       "installerHeaderIcon": "build-resources/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Tariq Karyana Store"
-    },
-    "portable": {
-      "artifactName": "${productName}-Portable-${version}.${ext}"
-    },
-    "linux": {
-      "target": [
-        {
-          "target": "AppImage",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "deb",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": "build-resources/icon.png",
-      "artifactName": "${productName}-${version}.${ext}",
-      "category": "Office",
-      "publish": {
-        "provider": "github",
-        "owner": "mohsin-rasheedbaga",
-        "repo": "Tariq-Karyana-Store"
-      }
-    },
-    "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ],
-      "icon": "build-resources/icon.icns",
-      "artifactName": "${productName}-${version}.${ext}",
-      "publish": {
-        "provider": "github",
-        "owner": "mohsin-rasheedbaga",
-        "repo": "Tariq-Karyana-Store"
-      }
+      "shortcutName": "Tariq Karyana Store",
+      "deleteAppDataOnUninstall": false
     },
     "publish": {
       "provider": "github",
