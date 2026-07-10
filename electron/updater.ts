@@ -11,7 +11,6 @@ autoUpdater.logger = log;
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
 autoUpdater.allowDowngrade = false;
-autoUpdater.currentVersion = app.getVersion();
 
 export function setupAutoUpdater(mainWindow: BrowserWindow) {
   log.info(`[Updater] Current version: ${app.getVersion()}`);
