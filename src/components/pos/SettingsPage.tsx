@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Database, Cloud, Upload, RefreshCw } from 'lucide-react';
+import { Save, Database, Cloud, Upload, RefreshCw, Printer, Search, TestTube2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store/app-store';
 import { t } from '@/lib/i18n';
@@ -24,6 +25,9 @@ export function SettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [saving, setSaving] = useState(false);
   const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [printerPorts, setPrinterPorts] = useState<Array<{ path: string; manufacturer?: string }>>([]);
+  const [selectedPort, setSelectedPort] = useState('');
+  const [testingPrinter, setTestingPrinter] = useState(false);
 
   useEffect(() => {
     fetch('/api/settings').then(r => r.json()).then(setSettings);
@@ -50,6 +54,43 @@ export function SettingsPage() {
   };
 
   const update = (k: string, v: any) => setSettings(s => s ? { ...s, [k]: v } : s);
+
+  const handleDetectPrinter = async () => {
+    try {
+      if (window.electronAPI) {
+        const ports = await window.electronAPI.printerListPorts();
+        setPrinterPorts(ports);
+        if (ports.length > 0) {
+          const detected = await window.electronAPI.printerAutoDetect();
+          if (detected) {
+            setSelectedPort(detected);
+            update('defaultPrinter', detected);
+            toast.success(lang === 'ur' ? `پرنٹر مل گیا: ${detected}` : `Printer found: ${detected}`);
+          }
+        } else {
+          toast.error(lang === 'ur' ? 'کوئی پرنٹر نہیں ملا' : 'No printer found');
+        }
+      } else {
+        toast.error(lang === 'ur' ? 'پرنٹر صرف ڈیسک ٹاپ ایپ میں کام کرتا ہے' : 'Printer only works in desktop app');
+      }
+    } catch (e: any) {
+      toast.error(e.message || 'Printer error');
+    }
+  };
+
+  const handleTestPrint = async () => {
+    if (!selectedPort) { toast.error(lang === 'ur' ? 'پہلے پرنٹر منتخب کریں' : 'Select a printer first'); return; }
+    setTestingPrinter(true);
+    try {
+      if (window.electronAPI) {
+        const result = await window.electronAPI.printerTest(selectedPort);
+        if (result.success) toast.success(lang === 'ur' ? 'ٹیسٹ پرنٹ کامیاب!' : 'Test print successful!');
+        else toast.error(result.message);
+      }
+    } catch (e: any) {
+      toast.error(e.message || 'Print error');
+    } finally { setTestingPrinter(false); }
+  };
 
   if (!settings) return <div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto" />;
 
@@ -95,6 +136,50 @@ export function SettingsPage() {
           <Button variant="outline" className="gap-2" onClick={() => toast.info(t('set.sync_coming', lang))}>
             <Upload className="h-4 w-4" /> {t('set.sync_now', lang)}
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Printer Settings - 58mm Thermal */}
+      <Card className={cn(isDark && 'bg-slate-800 border-slate-700')}>
+        <CardHeader>
+          <CardTitle className={cn("text-lg flex items-center gap-2", isDark && 'text-white')}>
+            <Printer className="h-5 w-5 text-orange-500" /> {lang === 'ur' ? 'تھرمل پرنٹر (58mm)' : 'Thermal Printer (58mm)'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            {lang === 'ur' ? 'Bluetooth تھرمل پرنٹر خود بخود تلاش کریں' : 'Auto-detect Bluetooth thermal printer via COM port'}
+          </p>
+          <div className="flex gap-2">
+            <Button variant="outline" className="gap-2" onClick={handleDetectPrinter}>
+              <Search className="h-4 w-4" /> {lang === 'ur' ? 'پرنٹر تلاش کریں' : 'Detect Printer'}
+            </Button>
+            <Button variant="outline" className="gap-2" onClick={handleTestPrint} disabled={!selectedPort || testingPrinter}>
+              <TestTube2 className="h-4 w-4" /> {testingPrinter ? '...' : (lang === 'ur' ? 'ٹیسٹ پرنٹ' : 'Test Print')}
+            </Button>
+          </div>
+          {printerPorts.length > 0 && (
+            <div className="space-y-2">
+              <Label>{lang === 'ur' ? 'COM پورٹ' : 'COM Port'}</Label>
+              <Select value={selectedPort} onValueChange={v => { setSelectedPort(v); update('defaultPrinter', v); }}>
+                <SelectTrigger><SelectValue placeholder={lang === 'ur' ? 'پورٹ منتخب کریں' : 'Select port'} /></SelectTrigger>
+                <SelectContent>
+                  {printerPorts.map(p => (
+                    <SelectItem key={p.path} value={p.path}>
+                      {p.path} {p.manufacturer ? `(${p.manufacturer})` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">{t('set.auto_print', lang)}</p>
+              <p className="text-xs text-muted-foreground">{lang === 'ur' ? 'فروخت کے بعد خود بخود پرنٹ نکالے' : 'Auto print after sale'}</p>
+            </div>
+            <Switch checked={settings.autoPrint} onCheckedChange={v => update('autoPrint', v)} />
+          </div>
         </CardContent>
       </Card>
 

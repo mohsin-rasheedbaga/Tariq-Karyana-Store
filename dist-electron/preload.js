@@ -7,6 +7,12 @@ electron_1.contextBridge.exposeInMainWorld('electronAPI', {
     getDbPath: () => electron_1.ipcRenderer.invoke('get-db-path'),
     checkForUpdates: () => electron_1.ipcRenderer.invoke('check-for-updates'),
     relaunchApp: () => electron_1.ipcRenderer.invoke('relaunch-app'),
+    // Printer APIs
+    printerListPorts: () => electron_1.ipcRenderer.invoke('printer-list-ports'),
+    printerAutoDetect: () => electron_1.ipcRenderer.invoke('printer-auto-detect'),
+    printerTest: (comPort, baudRate) => electron_1.ipcRenderer.invoke('printer-test', comPort, baudRate),
+    printerPrint: (comPort, data, baudRate) => electron_1.ipcRenderer.invoke('printer-print', comPort, data, baudRate),
+    // Update events
     onUpdateAvailable: (callback) => {
         electron_1.ipcRenderer.on('update-available', (_event, info) => callback(info));
     },

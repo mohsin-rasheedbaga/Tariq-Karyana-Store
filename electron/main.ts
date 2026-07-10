@@ -5,6 +5,7 @@ import fs from 'fs';
 import http from 'http';
 import { spawn, ChildProcess } from 'child_process';
 import { setupAutoUpdater } from './updater';
+import { sendToPrinter, listPorts, autoDetectPrinter, buildTestReceipt } from './printer';
 
 let mainWindow: BrowserWindow | null = null;
 let childServer: ChildProcess | null = null;
@@ -353,6 +354,36 @@ ipcMain.handle('get-log-path', () => logFile);
 ipcMain.handle('open-log', () => shell.openPath(logFile));
 ipcMain.handle('open-devtools', () => mainWindow?.webContents.openDevTools());
 ipcMain.handle('relaunch-app', () => { app.relaunch(); app.quit(); });
+
+// Printer IPC handlers
+ipcMain.handle('printer-list-ports', async () => {
+  log('Listing serial ports...');
+  const ports = await listPorts();
+  log(`Found ${ports.length} ports: ${ports.map(p => p.path).join(', ')}`);
+  return ports;
+});
+
+ipcMain.handle('printer-auto-detect', async () => {
+  log('Auto-detecting printer...');
+  const detected = await autoDetectPrinter();
+  log(`Auto-detected port: ${detected || 'none'}`);
+  return detected;
+});
+
+ipcMain.handle('printer-test', async (_e, comPort: string, baudRate?: number) => {
+  log(`Test print on ${comPort} @ ${baudRate || 9600}bps`);
+  const data = buildTestReceipt();
+  const result = await sendToPrinter(comPort, data, baudRate || 9600);
+  log(`Test print result: ${result.success ? 'OK' : result.message}`);
+  return result;
+});
+
+ipcMain.handle('printer-print', async (_e, comPort: string, data: string, baudRate?: number) => {
+  log(`Printing to ${comPort} (${data.length} bytes)`);
+  const result = await sendToPrinter(comPort, data, baudRate || 9600);
+  log(`Print result: ${result.success ? 'OK' : result.message}`);
+  return result;
+});
 
 // App lifecycle
 app.whenReady().then(async () => {

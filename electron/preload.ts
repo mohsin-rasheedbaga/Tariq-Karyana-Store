@@ -6,6 +6,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getDbPath: () => ipcRenderer.invoke('get-db-path'),
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
   relaunchApp: () => ipcRenderer.invoke('relaunch-app'),
+
+  // Printer APIs
+  printerListPorts: () => ipcRenderer.invoke('printer-list-ports'),
+  printerAutoDetect: () => ipcRenderer.invoke('printer-auto-detect'),
+  printerTest: (comPort: string, baudRate?: number) => ipcRenderer.invoke('printer-test', comPort, baudRate),
+  printerPrint: (comPort: string, data: string, baudRate?: number) => ipcRenderer.invoke('printer-print', comPort, data, baudRate),
+
+  // Update events
   onUpdateAvailable: (callback: (info: { version: string; releaseDate: string; releaseNotes: string }) => void) => {
     ipcRenderer.on('update-available', (_event, info) => callback(info));
   },
@@ -21,7 +29,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   installUpdate: () => ipcRenderer.send('install-update'),
 });
 
-// Type definitions for the exposed API
 declare global {
   interface Window {
     electronAPI?: {
@@ -30,6 +37,10 @@ declare global {
       getDbPath: () => Promise<string>;
       checkForUpdates: () => Promise<{ checking: boolean; message?: string }>;
       relaunchApp: () => Promise<void>;
+      printerListPorts: () => Promise<Array<{ path: string; manufacturer?: string }>>;
+      printerAutoDetect: () => Promise<string | null>;
+      printerTest: (comPort: string, baudRate?: number) => Promise<{ success: boolean; message: string }>;
+      printerPrint: (comPort: string, data: string, baudRate?: number) => Promise<{ success: boolean; message: string }>;
       onUpdateAvailable: (callback: (info: { version: string; releaseDate: string; releaseNotes: string }) => void) => void;
       onUpdateProgress: (callback: (progress: { percent: number; bytesPerSecond: number }) => void) => void;
       onUpdateDownloaded: (callback: (info: { version: string }) => void) => void;

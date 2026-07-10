@@ -10,6 +10,7 @@ const fs_1 = __importDefault(require("fs"));
 const http_1 = __importDefault(require("http"));
 const child_process_1 = require("child_process");
 const updater_1 = require("./updater");
+const printer_1 = require("./printer");
 let mainWindow = null;
 let childServer = null;
 let serverPort = 3000;
@@ -323,6 +324,32 @@ electron_1.ipcMain.handle('get-log-path', () => logFile);
 electron_1.ipcMain.handle('open-log', () => electron_1.shell.openPath(logFile));
 electron_1.ipcMain.handle('open-devtools', () => mainWindow?.webContents.openDevTools());
 electron_1.ipcMain.handle('relaunch-app', () => { electron_1.app.relaunch(); electron_1.app.quit(); });
+// Printer IPC handlers
+electron_1.ipcMain.handle('printer-list-ports', async () => {
+    log('Listing serial ports...');
+    const ports = await (0, printer_1.listPorts)();
+    log(`Found ${ports.length} ports: ${ports.map(p => p.path).join(', ')}`);
+    return ports;
+});
+electron_1.ipcMain.handle('printer-auto-detect', async () => {
+    log('Auto-detecting printer...');
+    const detected = await (0, printer_1.autoDetectPrinter)();
+    log(`Auto-detected port: ${detected || 'none'}`);
+    return detected;
+});
+electron_1.ipcMain.handle('printer-test', async (_e, comPort, baudRate) => {
+    log(`Test print on ${comPort} @ ${baudRate || 9600}bps`);
+    const data = (0, printer_1.buildTestReceipt)();
+    const result = await (0, printer_1.sendToPrinter)(comPort, data, baudRate || 9600);
+    log(`Test print result: ${result.success ? 'OK' : result.message}`);
+    return result;
+});
+electron_1.ipcMain.handle('printer-print', async (_e, comPort, data, baudRate) => {
+    log(`Printing to ${comPort} (${data.length} bytes)`);
+    const result = await (0, printer_1.sendToPrinter)(comPort, data, baudRate || 9600);
+    log(`Print result: ${result.success ? 'OK' : result.message}`);
+    return result;
+});
 // App lifecycle
 electron_1.app.whenReady().then(async () => {
     log('=== Tariq Karyana Store Starting ===');

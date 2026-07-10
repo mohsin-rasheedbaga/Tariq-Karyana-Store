@@ -9,6 +9,19 @@ declare global {
                 message?: string;
             }>;
             relaunchApp: () => Promise<void>;
+            printerListPorts: () => Promise<Array<{
+                path: string;
+                manufacturer?: string;
+            }>>;
+            printerAutoDetect: () => Promise<string | null>;
+            printerTest: (comPort: string, baudRate?: number) => Promise<{
+                success: boolean;
+                message: string;
+            }>;
+            printerPrint: (comPort: string, data: string, baudRate?: number) => Promise<{
+                success: boolean;
+                message: string;
+            }>;
             onUpdateAvailable: (callback: (info: {
                 version: string;
                 releaseDate: string;
