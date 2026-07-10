@@ -1356,3 +1356,4 @@ https://nextjs.org/docs/messages/module-not-found
  GET /api/dashboard 200 in 17ms (compile: 4ms, render: 13ms)
 ✓ Compiled in 563ms
  GET /api/dashboard 200 in 16ms (compile: 3ms, render: 13ms)
+ GET /api/dashboard 200 in 13ms (compile: 3ms, render: 10ms)
