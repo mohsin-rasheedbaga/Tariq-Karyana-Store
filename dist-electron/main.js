@@ -116,12 +116,20 @@ async function startServer() {
         log(`FATAL: ${msg}`);
         throw new Error(msg);
     }
-    // Verify node_modules and Prisma engine
+    // Verify node_modules exists
     if (!fs_1.default.existsSync(nmPath)) {
         const msg = `node_modules not found at ${nmPath}`;
         log(`FATAL: ${msg}`);
         throw new Error(msg);
     }
+    // CRITICAL: Verify the 'next' module exists in standalone node_modules
+    const nextModulePath = path_1.default.join(nmPath, 'next');
+    if (!fs_1.default.existsSync(nextModulePath)) {
+        const msg = `'next' module not found at ${nextModulePath}. The build may be incomplete.`;
+        log(`FATAL: ${msg}`);
+        throw new Error(msg);
+    }
+    log(`next module verified at: ${nextModulePath}`);
     // Verify Prisma engine binary exists
     const prismaClientDir = path_1.default.join(nmPath, '.prisma', 'client');
     if (fs_1.default.existsSync(prismaClientDir)) {
