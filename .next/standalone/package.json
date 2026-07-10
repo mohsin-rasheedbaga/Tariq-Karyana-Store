@@ -1,0 +1,221 @@
+{
+  "name": "tariq-karyana-store",
+  "version": "1.0.4",
+  "private": true,
+  "description": "Tariq Karyana Store - POS System with Customer Card System",
+  "main": "dist-electron/main.js",
+  "author": {
+    "name": "Tariq Karyana Store",
+    "email": "tariq@store.com"
+  },
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev -p 3000 2>&1 | tee dev.log",
+    "build": "node scripts/build-standalone.js",
+    "build:electron": "npm run build && tsc -p electron/tsconfig.json",
+    "start": "NODE_ENV=production bun .next/standalone/server.js 2>&1 | tee server.log",
+    "electron:dev": "npm run build:electron && electron .",
+    "electron:build": "npm run build:electron && electron-builder --publish always",
+    "electron:build:win": "npm run build:electron && electron-builder --win --publish always",
+    "electron:build:linux": "npm run build:electron && electron-builder --linux --publish always",
+    "electron:build:mac": "npm run build:electron && electron-builder --mac --publish always",
+    "lint": "eslint .",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@hookform/resolvers": "^5.1.1",
+    "@prisma/client": "^6.11.1",
+    "@radix-ui/react-accordion": "^1.2.11",
+    "@radix-ui/react-alert-dialog": "^1.1.14",
+    "@radix-ui/react-aspect-ratio": "^1.1.7",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-checkbox": "^1.3.2",
+    "@radix-ui/react-collapsible": "^1.1.11",
+    "@radix-ui/react-context-menu": "^2.2.15",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-hover-card": "^1.1.14",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-menubar": "^1.1.15",
+    "@radix-ui/react-navigation-menu": "^1.2.13",
+    "@radix-ui/react-popover": "^1.1.14",
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-radio-group": "^1.3.7",
+    "@radix-ui/react-scroll-area": "^1.2.9",
+    "@radix-ui/react-select": "^2.2.5",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slider": "^1.3.5",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-switch": "^1.2.5",
+    "@radix-ui/react-tabs": "^1.1.12",
+    "@radix-ui/react-toast": "^1.2.14",
+    "@radix-ui/react-toggle": "^1.1.9",
+    "@radix-ui/react-toggle-group": "^1.1.10",
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "@reactuses/core": "^6.0.5",
+    "@tanstack/react-query": "^5.82.0",
+    "@tanstack/react-table": "^8.21.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "date-fns": "^4.1.0",
+    "embla-carousel-react": "^8.6.0",
+    "framer-motion": "^12.23.2",
+    "input-otp": "^1.4.2",
+    "jsbarcode": "^3.12.3",
+    "lucide-react": "^0.525.0",
+    "next": "^16.1.1",
+    "next-auth": "^4.24.11",
+    "next-intl": "^4.3.4",
+    "next-themes": "^0.4.6",
+    "react": "^19.0.0",
+    "react-day-picker": "^9.8.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.60.0",
+    "recharts": "^2.15.4",
+    "sonner": "^2.0.6",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "uuid": "^11.1.0",
+    "vaul": "^1.1.2",
+    "zod": "^4.0.2",
+    "zustand": "^5.0.6",
+    "electron-log": "^5.3.3",
+    "electron-updater": "^6.6.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "bun-types": "^1.3.4",
+    "electron": "^35.2.1",
+    "electron-builder": "^26.0.12",
+    "eslint": "^9",
+    "eslint-config-next": "^16.1.1",
+    "prisma": "^6.11.1",
+    "tailwindcss": "^4",
+    "tw-animate-css": "^1.3.5",
+    "typescript": "^5"
+  },
+  "build": {
+    "appId": "com.tariqkaryana.pos",
+    "productName": "Tariq Karyana Store",
+    "copyright": "Copyright 2025 Tariq Karyana Store",
+    "directories": {
+      "output": "release",
+      "buildResources": "build-resources"
+    },
+    "files": [
+      "dist-electron/**/*",
+      "public/**/*",
+      "prisma/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": ".next/standalone",
+        "to": "standalone",
+        "filter": ["**/*", "!**/node_modules/**"]
+      },
+      {
+        "from": ".next/standalone/node_modules",
+        "to": "standalone/node_modules",
+        "filter": ["**/*", "!**/.cache/**"]
+      }
+    ],
+    "asarUnpack": [
+      "node_modules/.prisma/**/*"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build-resources/icon.ico",
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "publish": {
+        "provider": "github",
+        "owner": "mohsin-rasheedbaga",
+        "repo": "Tariq-Karyana-Store"
+      }
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build-resources/icon.ico",
+      "uninstallerIcon": "build-resources/icon.ico",
+      "installerHeaderIcon": "build-resources/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Tariq Karyana Store"
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build-resources/icon.png",
+      "artifactName": "${productName}-${version}.${ext}",
+      "category": "Office",
+      "publish": {
+        "provider": "github",
+        "owner": "mohsin-rasheedbaga",
+        "repo": "Tariq-Karyana-Store"
+      }
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "build-resources/icon.icns",
+      "artifactName": "${productName}-${version}.${ext}",
+      "publish": {
+        "provider": "github",
+        "owner": "mohsin-rasheedbaga",
+        "repo": "Tariq-Karyana-Store"
+      }
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "mohsin-rasheedbaga",
+      "repo": "Tariq-Karyana-Store"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+▲ Next.js 16.1.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://21.0.10.200:3000
+- Environments: .env
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+⚠ Turbopack's filesystem cache has been deleted because we previously detected an internal error in Turbopack. Builds or page loads may be slower as a result.
+✓ Ready in 754ms
+○ Compiling / ...
+ GET / 200 in 607ms (compile: 410ms, render: 197ms)
+ GET / 200 in 41ms (compile: 3ms, render: 38ms)
+SyntaxError: /home/z/my-project/package.json (directory description file): SyntaxError: /home/z/my-project/package.json (directory description file): SyntaxError: Expected double-quoted property name in JSON at position 4562 (line 135 column 19)
+    at JSON.parse (<anonymous>)
+    [2m[at Object.<anonymous> (/home/z/my-project/node_modules/enhanced-resolve/lib/CachedInputFileSystem.js:625:26)][0m
+    [2m[at CacheBackend.provideSync (/home/z/my-project/node_modules/enhanced-resolve/lib/CachedInputFileSystem.js:344:67)][0m
+    [2m[at SyncAsyncFileSystemDecorator.readJson (/home/z/my-project/node_modules/enhanced-resolve/lib/SyncAsyncFileSystemDecorator.js:197:29)][0m
+    [2m[at /home/z/my-project/node_modules/enhanced-resolve/lib/DescriptionFileUtils.js:104:26][0m
+    [2m[at next (/home/z/my-project/node_modules/enhanced-resolve/lib/forEachBail.js:35:3)][0m
+    [2m[at forEachBail (/home/z/my-project/node_modules/enhanced-resolve/lib/forEachBail.js:49:9)][0m
+    [2m[at findDescriptionFile (/home/z/my-project/node_modules/enhanced-resolve/lib/DescriptionFileUtils.js:70:3)][0m
+    [2m[at /home/z/my-project/node_modules/enhanced-resolve/lib/DescriptionFileUtils.js:167:12][0m
+    [2m[at /home/z/my-project/node_modules/enhanced-resolve/lib/forEachBail.js:39:13][0m
+✓ Compiled in 663ms
