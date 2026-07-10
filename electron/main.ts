@@ -134,6 +134,15 @@ async function startServer(): Promise<number> {
   }
   log(`next module verified at: ${nextModulePath}`);
 
+  // Also verify styled-jsx (commonly missing sub-dependency of next)
+  const styledJsxPath = path.join(nmPath, 'styled-jsx');
+  if (!fs.existsSync(styledJsxPath)) {
+    const msg = `'styled-jsx' module not found at ${styledJsxPath}. Build is incomplete.`;
+    log(`FATAL: ${msg}`);
+    throw new Error(msg);
+  }
+  log(`styled-jsx module verified at: ${styledJsxPath}`);
+
   // Verify Prisma engine binary exists
   const prismaClientDir = path.join(nmPath, '.prisma', 'client');
   if (fs.existsSync(prismaClientDir)) {
