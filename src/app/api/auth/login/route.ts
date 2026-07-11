@@ -2,19 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { SCHEMA_SQL } from '@/lib/schema-sql';
 
-let initialized = false;
+let dbReady = false;
+let schemaChecked = false;
 
-async function ensureDatabase() {
-  if (initialized) return;
+async function ensureSchema() {
+  if (schemaChecked) return;
+  schemaChecked = true;
 
   try {
-    // Check if User table exists by trying a simple count
     await db.user.count();
   } catch (error: any) {
     if (error.code === 'P2021') {
-      // Tables don't exist - create them using raw SQL
       console.log('[DB] Tables missing, creating schema...');
-      // Execute each statement separately (SQLite doesn't support multiple statements)
       const statements = SCHEMA_SQL
         .split(';')
         .map(s => s.trim())
@@ -24,7 +23,6 @@ async function ensureDatabase() {
         try {
           await db.$executeRawUnsafe(sql);
         } catch (e: any) {
-          // Ignore "already exists" errors
           if (!e.message?.includes('already exists')) {
             console.warn('[DB] Statement warning:', e.message?.slice(0, 100));
           }
@@ -32,11 +30,15 @@ async function ensureDatabase() {
       }
       console.log('[DB] Schema created successfully.');
     } else {
+      console.error('[DB] Unexpected error checking tables:', error.message || error);
+      // Reset so we retry on next request
+      schemaChecked = false;
       throw error;
     }
   }
+}
 
-  // Create default admin if no users exist
+async function ensureAdminUser() {
   try {
     const count = await db.user.count();
     if (count === 0) {
@@ -59,14 +61,15 @@ async function ensureDatabase() {
     }
   } catch (error) {
     console.error('[DB] Failed to create admin:', error);
+    // Don't throw — login handler will show a clear error
   }
-
-  initialized = true;
 }
 
 export async function POST(request: NextRequest) {
   try {
-    await ensureDatabase();
+    // Always ensure schema and admin on every login attempt (idempotent & safe)
+    await ensureSchema();
+    await ensureAdminUser();
 
     const { username, password } = await request.json();
     if (!username || !password) {
