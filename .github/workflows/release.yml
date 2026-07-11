@@ -36,37 +36,68 @@ jobs:
         run: npx tsc -p electron/tsconfig.json
 
       # Delete any pre-existing release for this tag to avoid duplicates
-      # (GitHub auto-creates a release when a tag is pushed)
       - name: Clean up duplicate release
+        shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tag = "${{ github.ref_name }}"
           Write-Host "Checking for existing release with tag: $tag"
+          $headers = @{
+            "Authorization" = "Bearer $env:GH_TOKEN"
+            "Accept" = "application/vnd.github+json"
+            "X-GitHub-Api-Version" = "2022-11-28"
+          }
           try {
-            $releases = gh release list --json tagName,isPrerelease,id -L 100 | ConvertFrom-Json
-            $dupes = $releases | Where-Object { $_.tagName -eq $tag }
-            foreach ($d in $dupes) {
-              Write-Host "Deleting duplicate release $($d.id) for tag $tag"
-              gh release delete $d.id --yes --cleanup-tag
+            $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers $headers
+            foreach ($r in $releases) {
+              if ($r.tag_name -eq $tag) {
+                Write-Host "Deleting duplicate release $($r.id) for tag $tag"
+                try {
+                  Invoke-RestMethod -Method DELETE -Uri "https://api.github.com/repos/${{ github.repository }}/releases/$($r.id)" -Headers $headers
+                  Write-Host "Deleted successfully"
+                } catch {
+                  Write-Host "Delete failed: $_"
+                }
+              }
             }
           } catch {
-            Write-Host "No existing release to clean up"
+            Write-Host "Could not list releases: $_"
           }
+          Write-Host "Cleanup done"
 
       - name: Build Electron app (Windows)
         run: npx electron-builder --win --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Mark this release as "latest" so the Releases page shows it correctly
       - name: Mark as latest release
         if: success()
+        shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tag = "${{ github.ref_name }}"
-          Write-Host "Setting $tag as latest release"
-          gh release edit $tag --latest
+          $headers = @{
+            "Authorization" = "Bearer $env:GH_TOKEN"
+            "Accept" = "application/vnd.github+json"
+            "X-GitHub-Api-Version" = "2022-11-28"
+          }
+          try {
+            $body = @{ make_latest = "true" } | ConvertTo-Json
+            $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers $headers
+            foreach ($r in $releases) {
+              if ($r.tag_name -eq $tag) {
+                Write-Host "Setting release $($r.id) ($tag) as latest"
+                Invoke-RestMethod -Method PATCH -Uri "https://api.github.com/repos/${{ github.repository }}/releases/$($r.id)" -Headers $headers -Body $body -ContentType "application/json"
+                Write-Host "Done"
+                break
+              }
+            }
+          } catch {
+            Write-Host "Could not set latest: $_"
+          }
 
       - name: Upload installer artifacts
         if: always()
