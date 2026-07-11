@@ -325,11 +325,19 @@ if (fs.existsSync(nextPkgNm)) {
 console.log('');
 
 // Step 4c: Copy known Next.js sub-dependencies
+// Next.js 16 requires typescript at runtime even with ignoreBuildErrors:true
+// because verify-typescript-setup.js does require('typescript') unconditionally.
+// Also include other devDeps that Next.js server needs at runtime.
+const devDepsNeededAtRuntime = [
+  'typescript',
+];
+
 const knownNextSubDeps = [
   'styled-jsx', 'postcss', 'autoprefixer', 'cssnano', 'nanoid',
   'picocolors', 'ansi-styles', 'color-convert', 'color-name',
   'has-flag', 'supports-color', 'chalk', 'optimism',
   '@swc/helpers',
+  ...devDepsNeededAtRuntime,
 ];
 console.log('[4c/7] Checking known Next.js sub-dependencies...');
 for (const dep of knownNextSubDeps) {
@@ -374,6 +382,7 @@ const checks = [
   ['.next/static', path.join(standaloneDir, '.next', 'static')],
   ['@swc/helpers', path.join(standaloneNm, '@swc', 'helpers')],
   ['public/', path.join(standaloneDir, 'public')],
+  ['typescript', path.join(standaloneNm, 'typescript')],
 ];
 
 let allOk = true;
