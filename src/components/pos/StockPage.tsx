@@ -127,13 +127,13 @@ export function StockPage() {
                   isDark ? 'bg-slate-700/50' : 'bg-slate-50'
                 )}>
                   <th className="text-left p-3 font-medium">Barcode</th>
-                  <th className="text-left p-3 font-medium">{t('products.name', lang)}</th>
+                  <th className="text-left p-3 font-medium">{t('prod.name', lang)}</th>
                   <th className="text-right p-3 font-medium">{t('stock.title', lang)}</th>
-                  <th className="text-right p-3 font-medium">{t('purchase.price', lang)}</th>
+                  <th className="text-right p-3 font-medium">{t('prod.purchase_price', lang)}</th>
                   <th className="text-right p-3 font-medium">{t('stock.total_value', lang)}</th>
                   <th className="text-center p-3 font-medium">{t('stock.status', lang)}</th>
                   {canAdjust && (
-                    <th className="text-center p-3 font-medium">{t('products.actions', lang)}</th>
+                    <th className="text-center p-3 font-medium">{t('common.actions', lang)}</th>
                   )}
                 </tr>
               </thead>

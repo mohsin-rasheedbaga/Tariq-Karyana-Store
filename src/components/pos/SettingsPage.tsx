@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Database, Cloud, Upload, RefreshCw, Printer, Search, TestTube2 } from 'lucide-react';
+import { Save, Database, Cloud, Upload, RefreshCw, Printer, Search, TestTube2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,9 +28,13 @@ export function SettingsPage() {
   const [printerPorts, setPrinterPorts] = useState<Array<{ path: string; manufacturer?: string }>>([]);
   const [selectedPort, setSelectedPort] = useState('');
   const [testingPrinter, setTestingPrinter] = useState(false);
+  const [appVersion, setAppVersion] = useState('');
 
   useEffect(() => {
     fetch('/api/settings').then(r => r.json()).then(setSettings);
+    if (window.electronAPI) {
+      window.electronAPI.getAppVersion().then(setAppVersion).catch(() => {});
+    }
   }, []);
 
   const handleSave = async () => {
@@ -173,13 +177,6 @@ export function SettingsPage() {
               </Select>
             </div>
           )}
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">{t('set.auto_print', lang)}</p>
-              <p className="text-xs text-muted-foreground">{lang === 'ur' ? 'فروخت کے بعد خود بخود پرنٹ نکالے' : 'Auto print after sale'}</p>
-            </div>
-            <Switch checked={settings.autoPrint} onCheckedChange={v => update('autoPrint', v)} />
-          </div>
         </CardContent>
       </Card>
 
@@ -214,7 +211,7 @@ export function SettingsPage() {
             <Button variant="outline" className="gap-2" onClick={handleCheckUpdate} disabled={checkingUpdate}>
               <RefreshCw className={cn("h-4 w-4", checkingUpdate && "animate-spin")} /> {t('set.check_update', lang)}
             </Button>
-            <span className="text-xs text-muted-foreground">{t('set.version', lang)}: 2.0.0</span>
+            <span className="text-xs text-muted-foreground">{t('set.version', lang)}: {appVersion || '1.1.0'}</span>
           </div>
         </CardContent>
       </Card>

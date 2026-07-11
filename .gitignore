@@ -5,7 +5,11 @@ dist-electron/
 release/
 upload/
 db/
+tool-results/
 *.db
 *.log
 .env
 .dev.vars
+*.db-journal
+*.db-wal
+*.db-shm

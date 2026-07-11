@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { DollarSign, ShoppingCart, Package, Users, AlertTriangle, TrendingUp, Truck, Plus, UserPlus, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { DollarSign, ShoppingCart, Package, Users, AlertTriangle, TrendingUp, Truck, Plus, UserPlus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAppStore } from '@/store/app-store';
 import { t } from '@/lib/i18n';
@@ -24,17 +24,22 @@ export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const isDark = theme === 'dark';
 
+  const notifiedRef = new Set<string>();
+
   useEffect(() => {
     fetch('/api/dashboard').then(r => r.json()).then(data => {
       setStats(data);
-      // Add low stock notifications
+      // Add low stock notifications (deduplicated)
       if (data.lowStockProducts?.length > 0) {
         data.lowStockProducts.slice(0, 3).forEach((p: any) => {
-          addNotification({
-            type: 'low_stock',
-            title: t('notif.low_stock', lang),
-            message: `${p.name} ${t('notif.low_stock_msg', lang)} (${p.stock}/${p.minStock})`,
-          });
+          if (!notifiedRef.has(p.id)) {
+            notifiedRef.add(p.id);
+            addNotification({
+              type: 'low_stock',
+              title: t('notif.low_stock', lang),
+              message: `${p.name} ${t('notif.low_stock_msg', lang)} (${p.stock}/${p.minStock})`,
+            });
+          }
         });
       }
     });
@@ -45,11 +50,11 @@ export function Dashboard() {
   }
 
   const cards = [
-    { title: t('dash.today_sales', lang), value: stats.todaySales, icon: <DollarSign className="h-6 w-6" />, color: 'text-emerald-600', bg: isDark ? 'bg-emerald-900/40' : 'bg-emerald-50', change: '+12%', up: true },
-    { title: t('dash.today_purchases', lang), value: stats.todayPurchases, icon: <Truck className="h-6 w-6" />, color: 'text-blue-600', bg: isDark ? 'bg-blue-900/40' : 'bg-blue-50', change: '-5%', up: false },
-    { title: t('dash.total_products', lang), value: stats.totalProducts, icon: <Package className="h-6 w-6" />, color: 'text-purple-600', bg: isDark ? 'bg-purple-900/40' : 'bg-purple-50', change: null, up: true },
-    { title: t('dash.total_customers', lang), value: stats.totalCustomers, icon: <Users className="h-6 w-6" />, color: 'text-orange-600', bg: isDark ? 'bg-orange-900/40' : 'bg-orange-50', change: '+3', up: true },
-    { title: t('dash.today_expenses', lang), value: stats.totalExpenses, icon: <TrendingUp className="h-6 w-6" />, color: 'text-red-600', bg: isDark ? 'bg-red-900/40' : 'bg-red-50', change: null, up: false },
+    { title: t('dash.today_sales', lang), value: stats.todaySales, icon: <DollarSign className="h-6 w-6" />, color: 'text-emerald-600', bg: isDark ? 'bg-emerald-900/40' : 'bg-emerald-50' },
+    { title: t('dash.today_purchases', lang), value: stats.todayPurchases, icon: <Truck className="h-6 w-6" />, color: 'text-blue-600', bg: isDark ? 'bg-blue-900/40' : 'bg-blue-50' },
+    { title: t('dash.total_products', lang), value: stats.totalProducts, icon: <Package className="h-6 w-6" />, color: 'text-purple-600', bg: isDark ? 'bg-purple-900/40' : 'bg-purple-50' },
+    { title: t('dash.total_customers', lang), value: stats.totalCustomers, icon: <Users className="h-6 w-6" />, color: 'text-orange-600', bg: isDark ? 'bg-orange-900/40' : 'bg-orange-50' },
+    { title: t('dash.today_expenses', lang), value: stats.totalExpenses, icon: <TrendingUp className="h-6 w-6" />, color: 'text-red-600', bg: isDark ? 'bg-red-900/40' : 'bg-red-50' },
   ];
 
   const summaryCards = [
@@ -80,13 +85,7 @@ export function Dashboard() {
                   {card.icon}
                 </div>
               </div>
-              {card.change && (
-                <div className="flex items-center gap-1 mt-2">
-                  {card.up ? <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" /> : <ArrowDownRight className="h-3.5 w-3.5 text-red-500" />}
-                  <span className={cn("text-xs font-medium", card.up ? 'text-emerald-500' : 'text-red-500')}>{card.change}</span>
-                  <span className="text-xs text-muted-foreground ml-1">vs yesterday</span>
-                </div>
-              )}
+
             </CardContent>
           </Card>
         ))}
