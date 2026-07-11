@@ -38,7 +38,8 @@ const UNNECESSARY_DIRS = [
   '.git', '.cache', 'coverage', '__tests__', '__mocks__',
   'docs', 'doc', 'example', 'examples', 'website',
   '.github', '.vscode', '.idea', 'test', 'tests',
-  'typescript', 'ts', 'src', 'scripts',
+  // NOTE: 'typescript' removed — Next.js 16 requires it at runtime
+  'ts', 'src', 'scripts',
 ];
 
 function shouldDelete(fileName) {

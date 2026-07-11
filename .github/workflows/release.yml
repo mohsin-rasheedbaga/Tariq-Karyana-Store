@@ -35,10 +35,38 @@ jobs:
       - name: Compile Electron main process
         run: npx tsc -p electron/tsconfig.json
 
+      # Delete any pre-existing release for this tag to avoid duplicates
+      # (GitHub auto-creates a release when a tag is pushed)
+      - name: Clean up duplicate release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          Write-Host "Checking for existing release with tag: $tag"
+          try {
+            $releases = gh release list --json tagName,isPrerelease,id -L 100 | ConvertFrom-Json
+            $dupes = $releases | Where-Object { $_.tagName -eq $tag }
+            foreach ($d in $dupes) {
+              Write-Host "Deleting duplicate release $($d.id) for tag $tag"
+              gh release delete $d.id --yes --cleanup-tag
+            }
+          } catch {
+            Write-Host "No existing release to clean up"
+          }
+
       - name: Build Electron app (Windows)
         run: npx electron-builder --win --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Mark as latest release
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          Write-Host "Setting $tag as latest release"
+          gh release edit $tag --latest
 
       - name: Upload installer artifacts
         if: always()
