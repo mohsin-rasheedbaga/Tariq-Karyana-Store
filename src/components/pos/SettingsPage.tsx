@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Database, Cloud, Upload, RefreshCw, Printer, Search, TestTube2, Info } from 'lucide-react';
+import { Save, Database, Cloud, Upload, RefreshCw, Printer, Search, TestTube2, Info, Shield, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,12 +29,29 @@ export function SettingsPage() {
   const [selectedPort, setSelectedPort] = useState('');
   const [testingPrinter, setTestingPrinter] = useState(false);
   const [appVersion, setAppVersion] = useState('');
+  const [credUsername, setCredUsername] = useState('');
+  const [credPassword, setCredPassword] = useState('');
+  const [credConfirmPassword, setCredConfirmPassword] = useState('');
+  const [showCredPassword, setShowCredPassword] = useState(false);
+  const [savingCreds, setSavingCreds] = useState(false);
+  const [loadingCreds, setLoadingCreds] = useState(true);
 
   useEffect(() => {
     fetch('/api/settings').then(r => r.json()).then(setSettings);
     if (window.electronAPI) {
       window.electronAPI.getAppVersion().then(setAppVersion).catch(() => {});
     }
+    // Load current admin credentials (username only)
+    fetch('/api/users')
+      .then(r => r.json())
+      .then(users => {
+        if (Array.isArray(users) && users.length > 0) {
+          const admin = users.find((u: any) => u.role === 'admin') || users[0];
+          setCredUsername(admin.username || '');
+        }
+        setLoadingCreds(false);
+      })
+      .catch(() => setLoadingCreds(false));
   }, []);
 
   const handleSave = async () => {
@@ -96,11 +113,104 @@ export function SettingsPage() {
     } finally { setTestingPrinter(false); }
   };
 
+  const handleSaveCreds = async () => {
+    if (!credUsername.trim()) {
+      toast.error(lang === 'ur' ? 'یوزر نیم ضروری ہے' : 'Username is required');
+      return;
+    }
+    if (credPassword && credPassword !== credConfirmPassword) {
+      toast.error(t('myset.passwords_no_match', lang));
+      return;
+    }
+    setSavingCreds(true);
+    try {
+      // Find admin user
+      const usersRes = await fetch('/api/users');
+      const users = await usersRes.json();
+      const admin = Array.isArray(users) ? (users.find((u: any) => u.role === 'admin') || users[0]) : null;
+      if (!admin) {
+        toast.error(lang === 'ur' ? 'ایڈمن یوزر نہیں ملا' : 'Admin user not found');
+        return;
+      }
+      const updateData: any = { id: admin.id, username: credUsername.trim() };
+      if (credPassword) updateData.password = credPassword;
+      await fetch('/api/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData),
+      });
+      toast.success(lang === 'ur' ? 'لاگ ان معلومات محفوظ ہو گئی' : 'Login credentials saved');
+      setCredPassword('');
+      setCredConfirmPassword('');
+      // Update current session user
+      const { user } = useAppStore.getState();
+      if (user) {
+        useAppStore.getState().setAuth({ ...user, username: credUsername.trim() }, useAppStore.getState().token || '');
+      }
+    } catch {
+      toast.error(lang === 'ur' ? 'محفوظ نہیں ہو سکا' : 'Failed to save');
+    } finally {
+      setSavingCreds(false);
+    }
+  };
+
   if (!settings) return <div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto" />;
 
   return (
     <div className="space-y-6 max-w-2xl">
       <h2 className="text-2xl font-bold">{t('set.title', lang)}</h2>
+
+      {/* Login & Security Settings */}
+      <Card className={cn(isDark && 'bg-slate-800 border-slate-700')}>
+        <CardHeader>
+          <CardTitle className={cn("text-lg flex items-center gap-2", isDark && 'text-white')}>
+            <Shield className="h-5 w-5 text-emerald-500" /> {lang === 'ur' ? 'لاگ ان سیکیورٹی' : 'Login & Security'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            {lang === 'ur'
+              ? 'یہاں سے ایڈمن یوزر نیم اور پاسورڈ سیٹ یا تبدیل کریں۔' 
+              : 'Set or change the admin username and password here.'}
+          </p>
+          <div>
+            <Label>{t('login.username', lang)}</Label>
+            <Input value={credUsername} onChange={e => setCredUsername(e.target.value)} placeholder="admin" disabled={loadingCreds} />
+          </div>
+          <div>
+            <Label>{lang === 'ur' ? 'نیا پاسورڈ' : 'New Password'}</Label>
+            <div className="relative">
+              <Input
+                type={showCredPassword ? 'text' : 'password'}
+                value={credPassword}
+                onChange={e => setCredPassword(e.target.value)}
+                placeholder={lang === 'ur' ? 'تبدیل نہیں کرنا تو خالی چھوڑیں' : 'Leave empty to keep current'}
+                disabled={loadingCreds}
+              />
+              <Button
+                type="button" variant="ghost" size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9"
+                onClick={() => setShowCredPassword(!showCredPassword)}
+              >
+                {showCredPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
+          </div>
+          <div>
+            <Label>{lang === 'ur' ? 'پاسورڈ دوبارہ' : 'Confirm Password'}</Label>
+            <Input
+              type={showCredPassword ? 'text' : 'password'}
+              value={credConfirmPassword}
+              onChange={e => setCredConfirmPassword(e.target.value)}
+              placeholder={lang === 'ur' ? 'نیا پاسورڈ دوبارہ لکھیں' : 'Re-enter new password'}
+              disabled={loadingCreds}
+            />
+          </div>
+          <Button variant="outline" className="gap-2" onClick={handleSaveCreds} disabled={savingCreds || loadingCreds}>
+            <Save className="h-4 w-4" /> {savingCreds ? (lang === 'ur' ? 'محفوظ ہو رہا ہے...' : 'Saving...') : (lang === 'ur' ? 'لاگ ان معلومات محفوظ' : 'Save Credentials')}
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Store Settings */}
       <Card className={cn(isDark && 'bg-slate-800 border-slate-700')}>

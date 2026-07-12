@@ -35,7 +35,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { id, fullName, role, isActive, password, permissions, currentPassword } = await request.json();
+    const { id, username, fullName, role, isActive, password, permissions, currentPassword } = await request.json();
     
     // If currentPassword is provided, verify it first (for self password change)
     if (currentPassword && password) {
@@ -46,7 +46,16 @@ export async function PUT(request: NextRequest) {
       }
     }
     
+    // Check username uniqueness if changing
+    if (username) {
+      const existing = await db.user.findUnique({ where: { username } });
+      if (existing && existing.id !== id) {
+        return NextResponse.json({ error: 'Username already exists' }, { status: 409 });
+      }
+    }
+    
     const data: Record<string, any> = {};
+    if (username) data.username = username;
     if (fullName) data.fullName = fullName;
     if (role) data.role = role;
     if (typeof isActive === 'boolean') data.isActive = isActive;

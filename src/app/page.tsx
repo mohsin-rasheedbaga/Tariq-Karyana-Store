@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { Sidebar } from '@/components/pos/Sidebar';
-import { LoginPage } from '@/components/pos/LoginPage';
 import { Dashboard } from '@/components/pos/Dashboard';
 import { ProductsPage } from '@/components/pos/ProductsPage';
 import { CustomersPage } from '@/components/pos/CustomersPage';
@@ -40,7 +39,17 @@ export default function Home() {
     const savedToken = localStorage.getItem('pos-token');
     if (savedUser && savedToken) {
       try { const parsed = JSON.parse(savedUser); useAppStore.getState().setAuth(parsed, savedToken); } catch { /* ignore */ }
+      return;
     }
+    // Auto-login: no login page, directly authenticate as admin
+    fetch('/api/auth/auto-login', { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.user && data.token) {
+          useAppStore.getState().setAuth(data.user, data.token);
+        }
+      })
+      .catch(err => console.error('Auto-login failed:', err));
   }, []);
 
   useEffect(() => {
@@ -71,7 +80,9 @@ export default function Home() {
     return <div className="flex items-center justify-center h-screen"><div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" /></div>;
   }
 
-  if (!user) return <LoginPage />;
+  if (!user) {
+    return <div className="flex items-center justify-center h-screen"><div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" /></div>;
+  }
 
   const renderPage = () => {
     switch (activePage) {
