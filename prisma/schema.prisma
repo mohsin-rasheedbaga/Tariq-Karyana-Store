@@ -97,6 +97,8 @@ model Customer {
   phone       String?
   address     String?
   comments    String?
+  cardType    String   @default("regular") // regular, wholesale
+  accountNo   String   @unique
   openingBalance Float @default(0)
   balance     Float    @default(0)
   isActive    Boolean  @default(true)

@@ -1,8 +1,27 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { SCHEMA_SQL } from '@/lib/schema-sql';
+import { SCHEMA_SQL, MIGRATION_SQL } from '@/lib/schema-sql';
 
 let schemaChecked = false;
+
+async function runMigrations() {
+  try {
+    const statements = MIGRATION_SQL.split(';').map(s => s.trim()).filter(s => s.length > 0);
+    for (const sql of statements) {
+      try {
+        await db.$executeRawUnsafe(sql);
+      } catch (e: any) {
+        // Ignore "duplicate column" or "already exists" errors
+        if (!e.message?.includes('duplicate column') && !e.message?.includes('already exists')) {
+          console.warn('[DB] Migration warning:', e.message?.slice(0, 100));
+        }
+      }
+    }
+    console.log('[DB] Migrations completed.');
+  } catch (e) {
+    console.warn('[DB] Migration error:', e);
+  }
+}
 
 async function ensureSchema() {
   if (schemaChecked) return;
@@ -10,6 +29,8 @@ async function ensureSchema() {
 
   try {
     await db.user.count();
+    // Tables exist, run migrations
+    await runMigrations();
   } catch (error: any) {
     if (error.code === 'P2021') {
       console.log('[DB] Tables missing, creating schema...');
@@ -28,6 +49,8 @@ async function ensureSchema() {
         }
       }
       console.log('[DB] Schema created successfully.');
+      // Run migrations for existing databases
+      await runMigrations();
     } else {
       console.error('[DB] Unexpected error checking tables:', error.message || error);
       schemaChecked = false;

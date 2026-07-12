@@ -86,6 +86,8 @@ CREATE TABLE IF NOT EXISTS "Customer" (
     "phone" TEXT,
     "address" TEXT,
     "comments" TEXT,
+    "cardType" TEXT NOT NULL DEFAULT 'regular',
+    "accountNo" TEXT NOT NULL DEFAULT '',
     "openingBalance" REAL NOT NULL DEFAULT 0,
     "balance" REAL NOT NULL DEFAULT 0,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
@@ -306,4 +308,11 @@ CREATE TABLE IF NOT EXISTS "Settings" (
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
 );
+`;
+
+// Migration: Add new columns to existing databases
+export const MIGRATION_SQL = `
+ALTER TABLE "Customer" ADD COLUMN "cardType" TEXT NOT NULL DEFAULT 'regular';
+ALTER TABLE "Customer" ADD COLUMN "accountNo" TEXT NOT NULL DEFAULT '';
+CREATE UNIQUE INDEX IF NOT EXISTS "Customer_accountNo_key" ON "Customer"("accountNo");
 `;

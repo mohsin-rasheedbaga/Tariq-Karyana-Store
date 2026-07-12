@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface Product { id: string; barcode: string; name: string; salePrice: number; wholeSalePrice: number; stock: number; unit?: { name: string }; }
-interface Customer { id: string; barcode: string; name: string; phone?: string; balance: number; }
+interface Customer { id: string; barcode: string; name: string; phone?: string; balance: number; cardType?: string; accountNo?: string; }
 
 interface CartItem {
   productId: string; productBarcode: string; productName: string;
@@ -63,10 +63,28 @@ export function SalesPage() {
     if (!barcode.trim()) return;
     if (barcode.trim().startsWith('C')) {
       const customer = customers.find(c => c.barcode === barcode.trim());
-      if (customer) { setSelectedCustomer(customer); toast.success(`${t('sale.customer_selected', lang)} ${customer.name}`); setCustomerBarcode(''); customerBarcodeRef.current?.focus(); return; }
+      if (customer) {
+        setSelectedCustomer(customer);
+        // Auto-switch to wholesale if customer has wholesale card
+        if (customer.cardType === 'wholesale') {
+          setSaleType('wholeSale');
+          toast.success(`${lang === 'ur' ? 'ہول سیلر' : 'Wholesale'}: ${customer.name}`, { description: lang === 'ur' ? 'ہول سیل ریٹ لاگو' : 'Wholesale rate applied' });
+        } else {
+          toast.success(`${t('sale.customer_selected', lang)} ${customer.name}`);
+        }
+        setCustomerBarcode(''); customerBarcodeRef.current?.focus(); return;
+      }
       const res = await fetch(`/api/customers?search=${barcode.trim()}`);
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) { setSelectedCustomer(data[0]); toast.success(`${t('sale.customer_selected', lang)} ${data[0].name}`); }
+      if (Array.isArray(data) && data.length > 0) {
+        setSelectedCustomer(data[0]);
+        if (data[0].cardType === 'wholesale') {
+          setSaleType('wholeSale');
+          toast.success(`${lang === 'ur' ? 'ہول سیلر' : 'Wholesale'}: ${data[0].name}`, { description: lang === 'ur' ? 'ہول سیل ریٹ لاگو' : 'Wholesale rate applied' });
+        } else {
+          toast.success(`${t('sale.customer_selected', lang)} ${data[0].name}`);
+        }
+      }
       setCustomerBarcode(''); return;
     }
     const product = products.find(p => p.barcode === barcode.trim());
@@ -148,7 +166,10 @@ export function SalesPage() {
               <UserCheck className="h-4 w-4 text-emerald-600" />
               <Input ref={customerBarcodeRef} placeholder={t('sale.customer_scan', lang)} value={customerBarcode} onChange={e => setCustomerBarcode(e.target.value)} onKeyDown={handleCustomerBarcodeKey} className="font-mono" />
               {selectedCustomer ? (
-                <Badge className="bg-emerald-100 text-emerald-800 gap-1 py-1 px-3">{selectedCustomer.name}<button onClick={() => setSelectedCustomer(null)}><X className="h-3 w-3" /></button></Badge>
+                <Badge className={cn("gap-1 py-1 px-3", selectedCustomer.cardType === 'wholesale' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800')}>
+                  {selectedCustomer.cardType === 'wholesale' ? 'WS' : 'REG'}
+                  {selectedCustomer.name}<button onClick={() => { setSelectedCustomer(null); setSaleType('cash'); }}><X className="h-3 w-3" /></button>
+                </Badge>
               ) : (
                 <Select onValueChange={v => { const c = customers.find(c => c.id === v); if (c) setSelectedCustomer(c); }}>
                   <SelectTrigger className="w-40"><SelectValue placeholder={t('sale.select_customer', lang)} /></SelectTrigger>
