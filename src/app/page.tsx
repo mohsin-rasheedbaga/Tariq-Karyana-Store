@@ -35,21 +35,30 @@ export default function Home() {
   }, [theme, lang]);
 
   useEffect(() => {
+    // Try localStorage first
     const savedUser = localStorage.getItem('pos-user');
     const savedToken = localStorage.getItem('pos-token');
     if (savedUser && savedToken) {
       try { const parsed = JSON.parse(savedUser); useAppStore.getState().setAuth(parsed, savedToken); } catch { /* ignore */ }
       return;
     }
-    // Auto-login: no login page, directly authenticate as admin
-    fetch('/api/auth/auto-login', { method: 'POST' })
-      .then(r => r.json())
-      .then(data => {
-        if (data.user && data.token) {
-          useAppStore.getState().setAuth(data.user, data.token);
-        }
-      })
-      .catch(err => console.error('Auto-login failed:', err));
+    // Direct admin login - no API call, app opens instantly
+    const adminPerms = {
+      dashboard: true, sales: true, products: true,
+      purchases: true, customers: true, expenses: true,
+      reports: true, users: true, settings: true, bank: true,
+      stock: true, categories: true, units: true, groups: true, party: true,
+    };
+    useAppStore.getState().setAuth({
+      id: 'local-admin',
+      username: 'admin',
+      fullName: 'Admin',
+      role: 'admin',
+      isActive: true,
+      permissions: adminPerms,
+    }, 'local');
+    // Background: ensure DB schema & admin user exist (non-blocking)
+    fetch('/api/auth/auto-login', { method: 'POST' }).catch(() => {});
   }, []);
 
   useEffect(() => {
