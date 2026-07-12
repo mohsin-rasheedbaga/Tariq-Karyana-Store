@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Database, Cloud, Upload, RefreshCw, Printer, Search, TestTube2, Info, Shield, Eye, EyeOff } from 'lucide-react';
+import { Save, Database, Cloud, Upload, RefreshCw, Printer, Search, TestTube2, Info, Shield, Eye, EyeOff, Download, CheckCircle2, AlertCircle, RestartApp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,11 +35,18 @@ export function SettingsPage() {
   const [showCredPassword, setShowCredPassword] = useState(false);
   const [savingCreds, setSavingCreds] = useState(false);
   const [loadingCreds, setLoadingCreds] = useState(true);
+  // Auto-update state
+  const [updateStatus, setUpdateStatus] = useState<{status: string; message: string; percent?: number} | null>(null);
 
   useEffect(() => {
     fetch('/api/settings').then(r => r.json()).then(setSettings);
     if (window.electronAPI) {
       window.electronAPI.getAppVersion().then(setAppVersion).catch(() => {});
+      // Listen for real-time update events from Electron main process
+      const unsubscribe = window.electronAPI.onUpdateStatus((data) => {
+        setUpdateStatus(data);
+      });
+      return () => { unsubscribe(); };
     }
     // Load current admin credentials (username only)
     fetch('/api/users')
@@ -67,11 +74,21 @@ export function SettingsPage() {
   };
 
   const handleCheckUpdate = () => {
+    if (!window.electronAPI) {
+      toast.error(lang === 'ur' ? 'یہ فیچر صرف ڈیسک ٹاپ ایپ میں کام کرتا ہے' : 'This feature only works in the desktop app');
+      return;
+    }
     setCheckingUpdate(true);
-    setTimeout(() => {
-      setCheckingUpdate(false);
-      toast.success(t('set.up_to_date', lang));
-    }, 1500);
+    setUpdateStatus({ status: 'checking', message: lang === 'ur' ? 'چیک ہو رہا ہے...' : 'Checking for updates...' });
+    // Send IPC to Electron main process to check for updates
+    window.electronAPI.checkForUpdates();
+    // Reset checking state after 30s timeout (in case no response)
+    setTimeout(() => { setCheckingUpdate(false); }, 30000);
+  };
+
+  const handleInstallUpdate = () => {
+    if (!window.electronAPI) return;
+    window.electronAPI.installUpdate();
   };
 
   const update = (k: string, v: any) => setSettings(s => s ? { ...s, [k]: v } : s);
@@ -308,21 +325,80 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Auto Update */}
+      {/* Auto Update - Real Electron auto-updater */}
       <Card className={cn(isDark && 'bg-slate-800 border-slate-700')}>
         <CardHeader>
           <CardTitle className={cn("text-lg flex items-center gap-2", isDark && 'text-white')}>
-            <RefreshCw className="h-5 w-5 text-emerald-500" /> {t('set.update', lang)}
+            <RefreshCw className="h-5 w-5 text-emerald-500" /> {lang === 'ur' ? 'آٹو اپڈیٹ' : 'Auto Update'}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-sm text-muted-foreground">{t('set.update_desc', lang)}</p>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            {lang === 'ur'
+              ? 'نئی ورژن آتی ہے تو یہ خود بخود ڈاؤن لوڈ ہو جائے گی اور ایپ بند ہونے پر انسٹال ہوگی۔ ڈیلٹا اپڈیٹ سپورٹ ہے - صرف تبدیلیاں ڈاؤن لوڈ ہوتی ہیں۔'
+              : 'New versions are downloaded automatically (delta updates). The app installs updates on quit.'}
+          </p>
+
+          {/* Current version badge */}
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="gap-2" onClick={handleCheckUpdate} disabled={checkingUpdate}>
-              <RefreshCw className={cn("h-4 w-4", checkingUpdate && "animate-spin")} /> {t('set.check_update', lang)}
-            </Button>
-            <span className="text-xs text-muted-foreground">{t('set.version', lang)}: {appVersion || '1.1.0'}</span>
+            <div className={cn("px-3 py-1.5 rounded-lg text-sm font-mono font-bold", isDark ? 'bg-slate-700 text-slate-200' : 'bg-slate-100 text-slate-700')}>
+              v{appVersion || '---'}
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {lang === 'ur' ? 'موجودہ ورژن' : 'Current Version'}
+            </span>
           </div>
+
+          {/* Update status display */}
+          {updateStatus && (
+            <div className={cn("rounded-lg p-3 border",
+              updateStatus.status === 'error' ? (isDark ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200') :
+              updateStatus.status === 'downloaded' ? (isDark ? 'bg-emerald-900/20 border-emerald-800' : 'bg-emerald-50 border-emerald-200') :
+              updateStatus.status === 'downloading' ? (isDark ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200') :
+              (isDark ? 'bg-slate-700 border-slate-600' : 'bg-slate-50 border-slate-200')
+            )}>
+              <div className="flex items-center gap-2">
+                {updateStatus.status === 'checking' && <RefreshCw className="h-4 w-4 animate-spin text-blue-500" />}
+                {updateStatus.status === 'available' && <Download className="h-4 w-4 text-blue-500" />}
+                {updateStatus.status === 'downloading' && <Download className="h-4 w-4 text-blue-500 animate-pulse" />}
+                {updateStatus.status === 'downloaded' && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
+                {updateStatus.status === 'not-available' && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
+                {updateStatus.status === 'error' && <AlertCircle className="h-4 w-4 text-red-500" />}
+                <p className="text-sm font-medium">{updateStatus.message}</p>
+              </div>
+              {/* Progress bar for downloading */}
+              {updateStatus.status === 'downloading' && updateStatus.percent !== undefined && (
+                <div className="mt-2">
+                  <div className={cn("w-full h-3 rounded-full overflow-hidden", isDark ? 'bg-slate-600' : 'bg-slate-200')}>
+                    <div
+                      className="h-full bg-blue-500 rounded-full transition-all duration-300"
+                      style={{ width: `${updateStatus.percent}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 text-right">{updateStatus.percent}%</p>
+                </div>
+              )}
+              {/* Install button when downloaded */}
+              {updateStatus.status === 'downloaded' && (
+                <Button className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 gap-2" onClick={handleInstallUpdate}>
+                  <RestartApp className="h-4 w-4" /> {lang === 'ur' ? 'ابھی ری اسٹارٹ کریں اور انسٹال کریں' : 'Restart Now & Install'}
+                </Button>
+              )}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            <Button variant="outline" className="gap-2" onClick={handleCheckUpdate} disabled={checkingUpdate || updateStatus?.status === 'downloading'}>
+              <RefreshCw className={cn("h-4 w-4", (checkingUpdate || updateStatus?.status === 'checking') && "animate-spin")} />
+              {checkingUpdate || updateStatus?.status === 'checking'
+                ? (lang === 'ur' ? 'چیک ہو رہا ہے...' : 'Checking...')
+                : (lang === 'ur' ? 'اپڈیٹ چیک کریں' : 'Check for Updates')}
+            </Button>
+          </div>
+
+          {!window.electronAPI && (
+            <p className="text-xs text-amber-500">{lang === 'ur' ? 'آٹو اپڈیٹ صرف ڈیسک ٹاپ ایپ میں کام کرتا ہے' : 'Auto-update only works in the desktop app'}</p>
+          )}
         </CardContent>
       </Card>
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { Sidebar } from '@/components/pos/Sidebar';
+import { FirstTimeSetup } from '@/components/pos/FirstTimeSetup';
 import { Dashboard } from '@/components/pos/Dashboard';
 import { ProductsPage } from '@/components/pos/ProductsPage';
 import { CustomersPage } from '@/components/pos/CustomersPage';
@@ -26,6 +27,7 @@ export default function Home() {
   const [activePage, setActivePage] = useState<Page>('dashboard');
   const [lowStockCount, setLowStockCount] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [setupDone, setSetupDone] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -33,6 +35,12 @@ export default function Home() {
     document.documentElement.dir = lang === 'ur' ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
   }, [theme, lang]);
+
+  useEffect(() => {
+    // Check if first-time setup has been completed
+    const done = localStorage.getItem('pos-setup-done');
+    setSetupDone(done === 'true');
+  }, []);
 
   useEffect(() => {
     // Try localStorage first
@@ -91,6 +99,22 @@ export default function Home() {
 
   if (!user) {
     return <div className="flex items-center justify-center h-screen"><div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" /></div>;
+  }
+
+  // Show first-time setup wizard if not done yet
+  if (!setupDone) {
+    return (
+      <>
+        <FirstTimeSetup
+          lang={lang}
+          onComplete={() => {
+            setSetupDone(true);
+            localStorage.setItem('pos-setup-done', 'true');
+          }}
+        />
+        <Toaster position="top-right" />
+      </>
+    );
   }
 
   const renderPage = () => {

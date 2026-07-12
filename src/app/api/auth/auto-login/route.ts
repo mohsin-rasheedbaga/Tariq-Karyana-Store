@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { SCHEMA_SQL, MIGRATION_SQL } from '@/lib/schema-sql';
 
 let schemaChecked = false;
+let seeded = false;
 
 async function runMigrations() {
   try {
@@ -86,10 +87,32 @@ async function ensureAdminUser() {
   }
 }
 
+async function ensureSeedProducts() {
+  if (seeded) return;
+  try {
+    const productCount = await db.product.count();
+    if (productCount === 0) {
+      console.log('[DB] No products found, seeding kiryana store products...');
+      // Call seed internally
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:' + (process.env.PORT || 3000);
+      const res = await fetch(`${baseUrl}/api/seed`, { method: 'POST' });
+      const data = await res.json();
+      console.log(`[DB] Seed result: ${JSON.stringify(data)}`);
+    }
+    seeded = true;
+  } catch (e) {
+    console.warn('[DB] Seed check failed (will retry next time):', e);
+    seeded = false;
+  }
+}
+
 export async function POST() {
   try {
     await ensureSchema();
     await ensureAdminUser();
+
+    // Auto-seed products in background (don't block login)
+    ensureSeedProducts().catch(() => {});
 
     const user = await db.user.findFirst({
       where: { isActive: true },
