@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Database, Cloud, Upload, RefreshCw, Printer, Search, TestTube2, Info, Shield, Eye, EyeOff, Download, CheckCircle2, AlertCircle, RestartApp } from 'lucide-react';
+import { Save, Database, Cloud, Upload, RefreshCw, Printer, Search, TestTube2, Info, Shield, Eye, EyeOff, Download, CheckCircle2, AlertCircle, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -381,7 +381,7 @@ export function SettingsPage() {
               {/* Install button when downloaded */}
               {updateStatus.status === 'downloaded' && (
                 <Button className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 gap-2" onClick={handleInstallUpdate}>
-                  <RestartApp className="h-4 w-4" /> {lang === 'ur' ? 'ابھی ری اسٹارٹ کریں اور انسٹال کریں' : 'Restart Now & Install'}
+                  <RotateCcw className="h-4 w-4" /> {lang === 'ur' ? 'ابھی ری اسٹارٹ کریں اور انسٹال کریں' : 'Restart Now & Install'}
                 </Button>
               )}
             </div>
