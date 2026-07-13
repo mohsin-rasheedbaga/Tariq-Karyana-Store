@@ -107,6 +107,7 @@
     "appId": "com.tariqkaryana.pos",
     "productName": "Tariq Karyana Store",
     "copyright": "Copyright 2025 Tariq Karyana Store",
+    "npmRebuild": false,
     "directories": {
       "output": "release",
       "buildResources": "build-resources"

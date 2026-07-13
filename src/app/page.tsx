@@ -27,6 +27,7 @@ export default function Home() {
   const [lowStockCount, setLowStockCount] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [dbReady, setDbReady] = useState(false);
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     setMounted(true);
@@ -146,8 +147,6 @@ export default function Home() {
       default: return <Dashboard />;
     }
   };
-
-  const isDark = theme === 'dark';
 
   return (
     <div className={cn(
