@@ -26,6 +26,7 @@ export default function Home() {
   const [activePage, setActivePage] = useState<Page>('dashboard');
   const [lowStockCount, setLowStockCount] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [dbReady, setDbReady] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -40,7 +41,6 @@ export default function Home() {
     const savedToken = localStorage.getItem('pos-token');
     if (savedUser && savedToken) {
       try { const parsed = JSON.parse(savedUser); useAppStore.getState().setAuth(parsed, savedToken); } catch { /* ignore */ }
-      return;
     }
     // Direct admin login - no API call, app opens instantly
     const adminPerms = {
@@ -57,8 +57,21 @@ export default function Home() {
       isActive: true,
       permissions: adminPerms,
     }, 'local');
-    // Background: ensure DB schema & admin user exist (non-blocking)
-    fetch('/api/auth/auto-login', { method: 'POST' }).catch(() => {});
+
+    // CRITICAL: Wait for auto-login (schema creation + seed) BEFORE any dashboard fetch
+    fetch('/api/auth/auto-login', { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        // Update user from DB if available
+        if (data.user) {
+          useAppStore.getState().setAuth(data.user, data.token || 'local');
+        }
+        setDbReady(true);
+      })
+      .catch(() => {
+        // Even if auto-login fails, mark dbReady so dashboard can try
+        setDbReady(true);
+      });
   }, []);
 
   useEffect(() => {
@@ -71,8 +84,9 @@ export default function Home() {
     }
   }, [user, token]);
 
+  // Only load dashboard data AFTER auto-login completes
   useEffect(() => {
-    if (!user) return;
+    if (!user || !dbReady) return;
     const load = async () => {
       try {
         const res = await fetch('/api/dashboard');
@@ -83,7 +97,7 @@ export default function Home() {
     void load();
     const interval = setInterval(load, 60000);
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, dbReady]);
 
   if (!mounted) {
     return <div className="flex items-center justify-center h-screen"><div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" /></div>;
@@ -91,6 +105,27 @@ export default function Home() {
 
   if (!user) {
     return <div className="flex items-center justify-center h-screen"><div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" /></div>;
+  }
+
+  // Show preparing state until DB is ready
+  if (!dbReady) {
+    return (
+      <div className={cn(
+        "flex h-screen overflow-hidden transition-colors duration-300",
+        isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+      )}>
+        <Sidebar activePage={activePage} onNavigate={setActivePage} lowStockCount={0} />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center space-y-3">
+            <div className="animate-spin h-10 w-10 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto" />
+            <p className="text-sm text-muted-foreground">
+              {lang === 'ur' ? 'ڈیٹا بیس تیار ہو رہا ہے...' : 'Preparing database...'}
+            </p>
+          </div>
+        </main>
+        <Toaster position="top-right" />
+      </div>
+    );
   }
 
   const renderPage = () => {

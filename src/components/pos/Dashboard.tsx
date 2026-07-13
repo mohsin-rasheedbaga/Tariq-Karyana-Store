@@ -22,28 +22,60 @@ interface DashboardStats {
 export function Dashboard() {
   const { lang, theme, addNotification } = useAppStore();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const isDark = theme === 'dark';
 
   const notifiedRef = new Set<string>();
 
+  const loadDashboard = () => {
+    setError(null);
+    fetch('/api/dashboard')
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        if (data.error) throw new Error(data.error);
+        setStats(data);
+        // Add low stock notifications (deduplicated)
+        if (data.lowStockProducts?.length > 0) {
+          data.lowStockProducts.slice(0, 3).forEach((p: any) => {
+            if (!notifiedRef.has(p.id)) {
+              notifiedRef.add(p.id);
+              addNotification({
+                type: 'low_stock',
+                title: t('notif.low_stock', lang),
+                message: `${p.name} ${t('notif.low_stock_msg', lang)} (${p.stock}/${p.minStock})`,
+              });
+            }
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Dashboard load error:', err);
+        setError(err.message);
+      });
+  };
+
   useEffect(() => {
-    fetch('/api/dashboard').then(r => r.json()).then(data => {
-      setStats(data);
-      // Add low stock notifications (deduplicated)
-      if (data.lowStockProducts?.length > 0) {
-        data.lowStockProducts.slice(0, 3).forEach((p: any) => {
-          if (!notifiedRef.has(p.id)) {
-            notifiedRef.add(p.id);
-            addNotification({
-              type: 'low_stock',
-              title: t('notif.low_stock', lang),
-              message: `${p.name} ${t('notif.low_stock_msg', lang)} (${p.stock}/${p.minStock})`,
-            });
-          }
-        });
-      }
-    });
-  }, [lang]);
+    loadDashboard();
+  }, [lang, retryCount]);
+
+  if (error && !stats) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <p className="text-red-500 text-sm">{lang === 'ur' ? 'ڈیش بورڈ لوڈ نہیں ہو سکا' : 'Failed to load dashboard'}</p>
+        <p className="text-xs text-muted-foreground">{error}</p>
+        <button
+          className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700"
+          onClick={() => setRetryCount(c => c + 1)}
+        >
+          {lang === 'ur' ? 'دوبارہ کوشش کریں' : 'Retry'}
+        </button>
+      </div>
+    );
+  }
 
   if (!stats) {
     return <div className="flex items-center justify-center h-64"><div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" /></div>;
