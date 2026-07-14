@@ -39,16 +39,23 @@ export function SettingsPage() {
   const [updateStatus, setUpdateStatus] = useState<{status: string; message: string; percent?: number} | null>(null);
 
   useEffect(() => {
-    fetch('/api/settings').then(r => r.json()).then(setSettings);
-    if (window.electronAPI) {
-      window.electronAPI.getAppVersion().then(setAppVersion).catch(() => {});
-      // Listen for real-time update events from Electron main process
-      const unsubscribe = window.electronAPI.onUpdateStatus((data) => {
-        setUpdateStatus(data);
+    // Fetch settings — with error fallback so page never shows infinite spinner
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(data => {
+        if (data && !data.error && data.id) {
+          setSettings(data);
+        } else {
+          // Fallback: API returned error or invalid data
+          setSettings({ id: 'default', storeName: 'Tariq Store', invoicePrefix: 'INV', autoPrint: false });
+        }
+      })
+      .catch(() => {
+        // Network error — use fallback so page still renders
+        setSettings({ id: 'default', storeName: 'Tariq Store', invoicePrefix: 'INV', autoPrint: false });
       });
-      return () => { unsubscribe(); };
-    }
-    // Load current admin credentials (username only)
+
+    // Load current admin credentials (username only) — MUST run regardless of electronAPI
     fetch('/api/users')
       .then(r => r.json())
       .then(users => {
@@ -59,6 +66,15 @@ export function SettingsPage() {
         setLoadingCreds(false);
       })
       .catch(() => setLoadingCreds(false));
+
+    // Electron-specific: version and update status listener
+    if (window.electronAPI) {
+      window.electronAPI.getAppVersion().then(setAppVersion).catch(() => {});
+      const unsubscribe = window.electronAPI.onUpdateStatus((data) => {
+        setUpdateStatus(data);
+      });
+      return () => { unsubscribe(); };
+    }
   }, []);
 
   const handleSave = async () => {

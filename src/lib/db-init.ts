@@ -13,39 +13,35 @@ export async function ensureDatabase(): Promise<void> {
   if (initialized) return;
 
   try {
-    // Check if tables exist by querying User table
-    await db.user.count();
-    // Tables exist - run migrations for any new columns
-    await runMigrations();
-    initialized = true;
-    return;
-  } catch (error: any) {
-    if (error.code === 'P2021') {
-      // Tables don't exist - create full schema
-      console.log('[DB] Tables missing, creating schema...');
-      const statements = SCHEMA_SQL
-        .split(';')
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
+    // ALWAYS run the full schema SQL — every statement uses IF NOT EXISTS
+    // so this is safe and idempotent. This fixes the bug where only the
+    // User table existed (from a partial init) but other tables were missing.
+    console.log('[DB] Ensuring database schema...');
+    const statements = SCHEMA_SQL
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
 
-      for (const sql of statements) {
-        try {
-          await db.$executeRawUnsafe(sql);
-        } catch (e: any) {
-          if (!e.message?.includes('already exists')) {
-            console.warn('[DB] Schema statement warning:', e.message?.slice(0, 100));
-          }
+    for (const sql of statements) {
+      try {
+        await db.$executeRawUnsafe(sql);
+      } catch (e: any) {
+        if (!e.message?.includes('already exists')) {
+          console.warn('[DB] Schema statement warning:', e.message?.slice(0, 100));
         }
       }
-      console.log('[DB] Schema created successfully.');
-
-      // Run migrations for existing databases
-      await runMigrations();
-      initialized = true;
-    } else {
-      console.error('[DB] Unexpected error checking tables:', error.message || error);
-      throw error;
     }
+    console.log('[DB] Schema verified/created successfully.');
+
+    // Run migrations for new columns on existing databases
+    await runMigrations();
+    initialized = true;
+    console.log('[DB] Database ready.');
+  } catch (error: any) {
+    console.error('[DB] Failed to initialize database:', error.message || error);
+    // Reset flag so next call retries
+    initialized = false;
+    throw error;
   }
 }
 
@@ -98,12 +94,20 @@ export async function ensureAdminUser(): Promise<void> {
 /**
  * Seed kiryana products if none exist.
  */
-export async function ensureProductsSeeded(): Promise<number> {
+export async function ensureProductsSeeded(forceReseed: boolean = false): Promise<number> {
   try {
     const productCount = await db.product.count();
-    if (productCount > 0) {
+    if (productCount > 0 && !forceReseed) {
       console.log(`[DB] ${productCount} products already exist, skipping seed.`);
       return productCount;
+    }
+
+    // If forceReseed and products exist, delete them first
+    if (forceReseed && productCount > 0) {
+      console.log(`[DB] Force reseeding: deleting ${productCount} existing products...`);
+      await db.saleItem.deleteMany({});
+      await db.sale.deleteMany({});
+      await db.product.deleteMany({});
     }
 
     console.log('[DB] No products found, seeding kiryana store products...');

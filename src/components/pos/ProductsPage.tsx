@@ -45,16 +45,21 @@ export function ProductsPage() {
   const [units, setUnits] = useState<Unit[]>([]);
 
   const loadData = useCallback(async () => {
-    const [pRes, cRes, gRes, uRes] = await Promise.all([
-      fetch('/api/products' + (search ? `?search=${search}` : '')).then(r => r.json()),
-      fetch('/api/categories').then(r => r.json()),
-      fetch('/api/groups').then(r => r.json()),
-      fetch('/api/units').then(r => r.json()),
-    ]);
-    setProducts(Array.isArray(pRes) ? pRes : []);
-    setCategories(Array.isArray(cRes) ? cRes : []);
-    setGroups(Array.isArray(gRes) ? gRes : []);
-    setUnits(Array.isArray(uRes) ? uRes : []);
+    try {
+      const [pRes, cRes, gRes, uRes] = await Promise.all([
+        fetch('/api/products' + (search ? `?search=${search}` : '')).then(r => r.json()),
+        fetch('/api/categories').then(r => r.json()),
+        fetch('/api/groups').then(r => r.json()),
+        fetch('/api/units').then(r => r.json()),
+      ]);
+      setProducts(Array.isArray(pRes) ? pRes : (pRes?.error ? [] : []));
+      setCategories(Array.isArray(cRes) ? cRes : []);
+      setGroups(Array.isArray(gRes) ? gRes : []);
+      setUnits(Array.isArray(uRes) ? uRes : []);
+    } catch (e) {
+      console.error('Failed to load products:', e);
+      setProducts([]);
+    }
   }, [search]);
 
   useEffect(() => { loadData(); }, [loadData]);
