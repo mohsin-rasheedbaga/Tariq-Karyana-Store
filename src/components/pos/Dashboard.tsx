@@ -19,7 +19,9 @@ interface DashboardStats {
   todayProfit: number;
 }
 
-export function Dashboard() {
+type Page = 'dashboard' | 'products' | 'customers' | 'sales' | 'purchases' | 'stock' | 'expenses' | 'bank' | 'reports' | 'users' | 'settings' | 'network' | 'my_settings';
+
+export function Dashboard({ onNavigate }: { onNavigate?: (page: Page) => void }) {
   const { lang, theme, addNotification } = useAppStore();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -144,13 +146,13 @@ export function Dashboard() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
-            <button className={cn("flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:scale-105 bg-emerald-500 text-white shadow-md shadow-emerald-500/20")}>
+            <button className={cn("flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:scale-105 bg-emerald-500 text-white shadow-md shadow-emerald-500/20")} onClick={() => onNavigate?.('sales')}>
               <Plus className="h-4 w-4" /> {t('dash.new_sale', lang)}
             </button>
-            <button className={cn("flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:scale-105", isDark ? 'bg-slate-700 text-slate-200' : 'bg-slate-100 text-slate-700')}>
+            <button className={cn("flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:scale-105", isDark ? 'bg-slate-700 text-slate-200' : 'bg-slate-100 text-slate-700')} onClick={() => onNavigate?.('products')}>
               <Package className="h-4 w-4" /> {t('dash.add_product', lang)}
             </button>
-            <button className={cn("flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:scale-105", isDark ? 'bg-slate-700 text-slate-200' : 'bg-slate-100 text-slate-700')}>
+            <button className={cn("flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:scale-105", isDark ? 'bg-slate-700 text-slate-200' : 'bg-slate-100 text-slate-700')} onClick={() => onNavigate?.('customers')}>
               <UserPlus className="h-4 w-4" /> {t('dash.add_customer', lang)}
             </button>
           </div>

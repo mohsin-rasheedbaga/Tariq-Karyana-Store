@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { Sidebar } from '@/components/pos/Sidebar';
+import { LoginPage } from '@/components/pos/LoginPage';
 import { Dashboard } from '@/components/pos/Dashboard';
 import { ProductsPage } from '@/components/pos/ProductsPage';
 import { CustomersPage } from '@/components/pos/CustomersPage';
@@ -37,42 +38,30 @@ export default function Home() {
   }, [theme, lang]);
 
   useEffect(() => {
-    // Try localStorage first
-    const savedUser = localStorage.getItem('pos-user');
-    const savedToken = localStorage.getItem('pos-token');
-    if (savedUser && savedToken) {
-      try { const parsed = JSON.parse(savedUser); useAppStore.getState().setAuth(parsed, savedToken); } catch { /* ignore */ }
-    }
-    // Direct admin login - no API call, app opens instantly
-    const adminPerms = {
-      dashboard: true, sales: true, products: true,
-      purchases: true, customers: true, expenses: true,
-      reports: true, users: true, settings: true, bank: true,
-      stock: true, categories: true, units: true, groups: true, party: true,
-    };
-    useAppStore.getState().setAuth({
-      id: 'local-admin',
-      username: 'admin',
-      fullName: 'Admin',
-      role: 'admin',
-      isActive: true,
-      permissions: adminPerms,
-    }, 'local');
-
-    // CRITICAL: Wait for auto-login (schema creation + seed) BEFORE any dashboard fetch
+    // Step 1: Initialize DB in background (schema + seed + admin creation)
+    // This runs regardless of auth state so DB is always ready
     fetch('/api/auth/auto-login', { method: 'POST' })
       .then(r => r.json())
       .then(data => {
-        // Update user from DB if available
-        if (data.user) {
-          useAppStore.getState().setAuth(data.user, data.token || 'local');
-        }
+        // DB is now ready (schema created, products seeded, admin exists)
         setDbReady(true);
       })
       .catch(() => {
-        // Even if auto-login fails, mark dbReady so dashboard can try
+        // Even if auto-login fails, mark dbReady so login page can work
         setDbReady(true);
       });
+
+    // Step 2: Check for saved session in localStorage
+    // If user was previously logged in, restore their session
+    const savedUser = localStorage.getItem('pos-user');
+    const savedToken = localStorage.getItem('pos-token');
+    if (savedUser && savedToken) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        useAppStore.getState().setAuth(parsed, savedToken);
+      } catch { /* ignore invalid data */ }
+    }
+    // NOTE: No auto-login bypass - user must enter credentials via LoginPage
   }, []);
 
   useEffect(() => {
@@ -105,7 +94,8 @@ export default function Home() {
   }
 
   if (!user) {
-    return <div className="flex items-center justify-center h-screen"><div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" /></div>;
+    // Show Login Page when not authenticated
+    return <LoginPage />;
   }
 
   // Show preparing state until DB is ready
@@ -131,7 +121,7 @@ export default function Home() {
 
   const renderPage = () => {
     switch (activePage) {
-      case 'dashboard': return hasPermission('dashboard') ? <Dashboard /> : <AccessDenied />;
+      case 'dashboard': return hasPermission('dashboard') ? <Dashboard onNavigate={setActivePage} /> : <AccessDenied />;
       case 'products': return <ProductsPage />;
       case 'customers': return <CustomersPage />;
       case 'sales': return <SalesPage />;
