@@ -71,8 +71,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Mark this release as "latest" so the Releases page shows it correctly
-      - name: Mark as latest release
+      # Publish draft release and mark as latest
+      - name: Publish release and mark as latest
         if: success()
         shell: pwsh
         env:
@@ -85,18 +85,19 @@ jobs:
             "X-GitHub-Api-Version" = "2022-11-28"
           }
           try {
-            $body = @{ make_latest = "true" } | ConvertTo-Json
             $releases = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases" -Headers $headers
             foreach ($r in $releases) {
               if ($r.tag_name -eq $tag) {
-                Write-Host "Setting release $($r.id) ($tag) as latest"
+                Write-Host "Found release $($r.id) for tag $tag (draft: $($r.draft))"
+                # Publish draft and mark as latest
+                $body = @{ draft = $false; make_latest = "true" } | ConvertTo-Json
                 Invoke-RestMethod -Method PATCH -Uri "https://api.github.com/repos/${{ github.repository }}/releases/$($r.id)" -Headers $headers -Body $body -ContentType "application/json"
-                Write-Host "Done"
+                Write-Host "Published and set as latest"
                 break
               }
             }
           } catch {
-            Write-Host "Could not set latest: $_"
+            Write-Host "Could not publish: $_"
           }
 
       - name: Upload installer artifacts
