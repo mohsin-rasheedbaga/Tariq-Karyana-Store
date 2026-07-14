@@ -1,6 +1,6 @@
 {
   "name": "tariq-karyana-store",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "private": true,
   "description": "Tariq Karyana Store - POS System with Customer Card System",
   "main": "dist-electron/main.js",
