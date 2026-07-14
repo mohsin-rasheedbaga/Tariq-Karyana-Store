@@ -89,7 +89,7 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
         {!collapsed && (
           <div className="overflow-hidden">
             <h1 className="font-bold text-sm leading-tight text-white">Tariq Store</h1>
-            <p className="text-[10px] text-slate-400">POS System v1.2.3</p>
+            <p className="text-[10px] text-slate-400">POS System v1.2.4</p>
           </div>
         )}
         <Button

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tariq Kiryana Store - POS System v1.2.3",
+  title: "Tariq Kiryana Store - POS System v1.2.4",
   description: "Modern Point of Sale System with Customer Card, Barcode, Cloud Backup, Multi-language, Network Sharing",
 };
 
