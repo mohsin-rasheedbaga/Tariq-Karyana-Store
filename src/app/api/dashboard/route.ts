@@ -1,8 +1,14 @@
 import { db } from '@/lib/db';
+import { ensureDatabase, ensureAdminUser, ensureProductsSeeded } from '@/lib/db-init';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    // CRITICAL: Ensure database is initialized before any query
+    await ensureDatabase();
+    await ensureAdminUser();
+    await ensureProductsSeeded();
+
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date();
@@ -42,19 +48,14 @@ export async function GET() {
       where: { isActive: true },
     });
 
-    // Low stock products
-    const lowStockProducts = await db.product.findMany({
-      where: {
-        isActive: true,
-        stock: { lte: db.product.fields.minStock },
-      },
-      include: {
-        subCategory: true,
-        group: true,
-        unit: true,
-      },
-      orderBy: { stock: 'asc' },
+    // Low stock products - fetch all and filter in JS (Prisma can't compare two fields)
+    const allActiveProducts = await db.product.findMany({
+      where: { isActive: true },
+      include: { subCategory: true, group: true, unit: true },
     });
+    const lowStockProducts = allActiveProducts
+      .filter(p => p.stock <= p.minStock)
+      .sort((a, b) => a.stock - b.stock);
 
     // Recent sales (last 5)
     const recentSales = await db.sale.findMany({
@@ -73,9 +74,8 @@ export async function GET() {
     });
     const totalExpenses = todayExpensesResult._sum.amount || 0;
 
-    // Total stock value
-    const allProducts = await db.product.findMany({ where: { isActive: true }, select: { stock: true, purchasePrice: true } });
-    const totalStockValue = allProducts.reduce((sum, p) => sum + (p.stock * p.purchasePrice), 0);
+    // Total stock value (reuse allActiveProducts from above)
+    const totalStockValue = allActiveProducts.reduce((sum, p) => sum + (p.stock * p.purchasePrice), 0);
 
     // Today's profit (sale total - cost of items sold today)
     const todaySalesItems = await db.saleItem.findMany({

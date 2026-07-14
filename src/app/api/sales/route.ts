@@ -1,9 +1,11 @@
 import { db } from '@/lib/db';
+import { ensureDatabase } from '@/lib/db-init';
 import { generateInvoiceNo } from '@/lib/barcode';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
+    await ensureDatabase();
     const { searchParams } = new URL(request.url);
     const from = searchParams.get('from');
     const to = searchParams.get('to');
@@ -39,6 +41,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await ensureDatabase();
     const body = await request.json();
     const { customerId, saleManName, saleType, items, discountAmount, paid, remarks } = body;
 

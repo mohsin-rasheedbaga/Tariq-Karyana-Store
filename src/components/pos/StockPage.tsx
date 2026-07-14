@@ -32,9 +32,15 @@ export function StockPage() {
   const canAdjust = hasPermission('stock');
 
   const loadData = async () => {
-    const res = await fetch('/api/stock');
-    const data = await res.json();
-    setItems(Array.isArray(data) ? data : []);
+    try {
+      const res = await fetch('/api/stock');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setItems(Array.isArray(data) ? data : []);
+    } catch (err: any) {
+      console.error('Stock load error:', err);
+      setItems([]);
+    }
   };
 
   useEffect(() => { void loadData(); }, []);

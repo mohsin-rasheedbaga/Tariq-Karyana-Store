@@ -1,8 +1,10 @@
 import { db } from '@/lib/db';
+import { ensureDatabase } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    await ensureDatabase();
     let settings = await db.settings.findFirst();
 
     if (!settings) {
@@ -21,6 +23,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+    await ensureDatabase();
     const body = await request.json();
 
     // Ensure settings exist

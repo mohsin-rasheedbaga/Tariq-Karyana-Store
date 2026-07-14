@@ -1,8 +1,10 @@
 import { db } from '@/lib/db';
+import { ensureDatabase } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    await ensureDatabase();
     const types = await db.expenseType.findMany({
       where: { isActive: true },
       include: {
@@ -22,6 +24,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await ensureDatabase();
     const body = await request.json();
 
     const type = await db.expenseType.create({

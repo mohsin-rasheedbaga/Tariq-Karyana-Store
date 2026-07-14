@@ -35,8 +35,8 @@ const navItems: NavItem[] = [
   { id: 'bank', key: 'nav.bank', icon: <CreditCard className="h-5 w-5" />, section: 'nav.finance' },
   { id: 'reports', key: 'nav.reports', icon: <TrendingUp className="h-5 w-5" />, section: 'nav.finance' },
   { id: 'users', key: 'nav.users', icon: <UserCog className="h-5 w-5" />, section: 'nav.system' },
-  { id: 'network', key: 'nav.network', icon: <Wifi className="h-5 w-5" />, section: 'nav.system' },
   { id: 'settings', key: 'nav.settings', icon: <Settings className="h-5 w-5" />, section: 'nav.system' },
+  { id: 'network', key: 'nav.network', icon: <Wifi className="h-5 w-5" />, section: 'nav.system' },
 ];
 
 const sections = [
@@ -193,9 +193,9 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
           const items = visibleNavItems.filter(n => n.section === section.key);
           if (items.length === 0) return null;
           return (
-            <div key={section.key} className="mb-2">
+            <div key={section.key} className="mb-1">
               {!collapsed && (
-                <p className="px-3 py-1 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                <p className="px-3 py-0.5 text-[9px] font-semibold text-slate-500 uppercase tracking-wider">
                   {t(section.key, lang)}
                 </p>
               )}
@@ -204,7 +204,7 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
                   key={item.id}
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start gap-3 h-10 px-3 mx-1 text-sm",
+                    "w-full justify-start gap-3 h-9 px-3 mx-1 text-sm",
                     activePage === item.id
                       ? "bg-emerald-600 text-white hover:bg-emerald-700"
                       : "text-slate-300 hover:bg-slate-700 hover:text-white"
@@ -227,7 +227,7 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
 
       <div className="h-2" />
 
-      {/* User + My Settings + Logout */}
+      {/* User + Settings Shortcut + My Settings + Logout */}
       <div className={cn("border-t border-slate-700/50 p-2", collapsed && "flex flex-col items-center gap-1")}>
         {!collapsed && user && (
           <div className="flex items-center gap-2 px-2 py-1 mb-1">
@@ -241,6 +241,14 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
             <Button
               variant="ghost" size="icon"
               className="h-7 w-7 text-slate-400 hover:text-white hover:bg-slate-700"
+              onClick={() => onNavigate('settings')}
+              title={t('nav.settings', lang)}
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost" size="icon"
+              className="h-7 w-7 text-slate-400 hover:text-white hover:bg-slate-700"
               onClick={() => onNavigate('my_settings')}
               title={t('nav.my_settings', lang)}
             >
@@ -249,14 +257,24 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
           </div>
         )}
         {collapsed && user && (
-          <Button
-            variant="ghost" size="icon"
-            className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-700 mb-1"
-            onClick={() => onNavigate('my_settings')}
-            title={t('nav.my_settings', lang)}
-          >
-            <UserCircle className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-1 mb-1">
+            <Button
+              variant="ghost" size="icon"
+              className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-700"
+              onClick={() => onNavigate('settings')}
+              title={t('nav.settings', lang)}
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost" size="icon"
+              className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-700 mb-1"
+              onClick={() => onNavigate('my_settings')}
+              title={t('nav.my_settings', lang)}
+            >
+              <UserCircle className="h-4 w-4" />
+            </Button>
+          </div>
         )}
         <Button
           variant="ghost"

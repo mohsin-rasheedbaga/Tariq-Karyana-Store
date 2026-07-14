@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import { ensureDatabase } from '@/lib/db-init';
 import { generateCustomerBarcode } from '@/lib/barcode';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -10,6 +11,7 @@ function generateAccountNo(): string {
 
 export async function GET(request: NextRequest) {
   try {
+    await ensureDatabase();
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
 
@@ -39,6 +41,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await ensureDatabase();
     const body = await request.json();
     const barcode = body.barcode || generateCustomerBarcode();
     const cardType = body.cardType || 'regular';

@@ -1,8 +1,10 @@
 import { db } from '@/lib/db';
+import { ensureDatabase } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    await ensureDatabase();
     const groups = await db.productGroup.findMany({
       where: { isActive: true },
       orderBy: { name: 'asc' },
@@ -17,6 +19,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await ensureDatabase();
     const body = await request.json();
 
     const group = await db.productGroup.create({

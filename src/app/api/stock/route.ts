@@ -1,12 +1,18 @@
 import { db } from '@/lib/db';
+import { ensureDatabase, ensureAdminUser, ensureProductsSeeded } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    // CRITICAL: Ensure database is initialized and products are seeded
+    await ensureDatabase();
+    await ensureAdminUser();
+    await ensureProductsSeeded();
+
+    // Show ALL products (not just stock > 0) so inventory is always visible
     const products = await db.product.findMany({
       where: {
         isActive: true,
-        stock: { gt: 0 },
       },
       include: {
         subCategory: true,
@@ -25,6 +31,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await ensureDatabase();
+
     const body = await request.json();
     const { productId, newStock, reason } = body;
 
