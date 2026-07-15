@@ -64,6 +64,11 @@ export function DailyClosingPage() {
     setError(null);
     try {
       const res = await fetch(`/api/daily-closing?date=${date}`);
+      if (!res.ok) {
+        let errMsg = `Request failed (${res.status})`;
+        try { const j = await res.json(); if (j.error) errMsg = j.error; } catch { /* not JSON */ }
+        throw new Error(errMsg);
+      }
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       setData(json);

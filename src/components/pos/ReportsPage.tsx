@@ -55,6 +55,11 @@ export function ReportsPage() {
       if (endDate) params.set('endDate', endDate.toISOString().split('T')[0]);
 
       const res = await fetch(`/api/reports?${params}`);
+      if (!res.ok) {
+        let errMsg = `Request failed (${res.status})`;
+        try { const j = await res.json(); if (j.error) errMsg = j.error; } catch { /* not JSON */ }
+        throw new Error(errMsg);
+      }
       const json = await res.json();
       if (json.error) throw new Error(json.error);
       setData(json);

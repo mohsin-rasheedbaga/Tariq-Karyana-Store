@@ -63,6 +63,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'dash.total_stock_value': 'Total Stock Value',
     'dash.profit_today': "Today's Profit",
     'dash.net_sales': 'Net Sales',
+    'dash.retry': 'Retry',
 
     // Products
     'prod.title': 'Product Management',
@@ -591,6 +592,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'dash.total_stock_value': 'کل اسٹاک ویلیو',
     'dash.profit_today': 'آج کا منافع',
     'dash.net_sales': 'نیٹ فروخت',
+    'dash.retry': 'دوبارہ کوشش کریں',
 
     // Products
     'prod.title': 'پراڈکٹس مینجمنٹ',

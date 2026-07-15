@@ -8,7 +8,7 @@ import {
   Bell, UserCircle, X, RotateCcw, CalendarDays, BookOpen, Store, Tags
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
+// ScrollArea removed - using native overflow-y-auto with min-h-0 for proper flex scrolling
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -94,7 +94,7 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
         {!collapsed && (
           <div className="overflow-hidden">
             <h1 className="font-bold text-sm leading-tight text-white">Tariq Store</h1>
-            <p className="text-[10px] text-slate-400">POS System v1.2.5</p>
+            <p className="text-[10px] text-slate-400">POS System v1.2.9</p>
           </div>
         )}
         <Button
@@ -176,7 +176,7 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 py-2">
+      <div className="overflow-y-auto flex-1 min-h-0 py-2">
         {/* NEW SALE BUTTON - Right after Dashboard */}
         <div className={cn("px-1 mb-2", collapsed && "px-0.5")}>
           <Button
@@ -228,9 +228,7 @@ export function Sidebar({ activePage, onNavigate, lowStockCount }: {
             </div>
           );
         })}
-      </ScrollArea>
-
-      <div className="h-2" />
+      </div>
 
       {/* User + Settings Shortcut + My Settings + Logout */}
       <div className={cn("border-t border-slate-700/50 p-2", collapsed && "flex flex-col items-center gap-1")}>

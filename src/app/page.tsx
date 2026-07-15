@@ -85,6 +85,10 @@ export default function Home() {
     const load = async () => {
       try {
         const res = await fetch('/api/dashboard');
+        if (!res.ok) {
+          // Silently skip on error - will retry on next interval
+          return;
+        }
         const data = await res.json();
         if (data.lowStockProducts) setLowStockCount(data.lowStockProducts.length);
       } catch { /* ignore */ }

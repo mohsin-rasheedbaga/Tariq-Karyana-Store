@@ -98,13 +98,17 @@ export async function ensureProductsSeeded(forceReseed: boolean = false): Promis
   try {
     const productCount = await db.product.count();
     if (productCount > 0 && !forceReseed) {
-      console.log(`[DB] ${productCount} products already exist, skipping seed.`);
-      return productCount;
+      if (productCount >= 10) {
+        console.log(`[DB] ${productCount} products already exist, skipping seed.`);
+        return productCount;
+      }
+      // Fewer than 10 products likely means a partial/failed seed — reseed
+      console.log(`[DB] Only ${productCount} products found (likely partial seed), reseeding...`);
     }
 
-    // If forceReseed and products exist, delete them first
-    if (forceReseed && productCount > 0) {
-      console.log(`[DB] Force reseeding: deleting ${productCount} existing products...`);
+    // If forceReseed or partial seed (fewer than 10 products), delete them first
+    if ((forceReseed || productCount < 10) && productCount > 0) {
+      console.log(`[DB] ${forceReseed ? 'Force reseeding' : 'Partial seed detected'}: deleting ${productCount} existing products...`);
       await db.saleItem.deleteMany({});
       await db.sale.deleteMany({});
       await db.product.deleteMany({});
