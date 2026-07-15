@@ -4,102 +4,82 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    // CRITICAL: Ensure database is initialized before any query
     await ensureDatabase();
     await ensureAdminUser();
-    await ensureProductsSeeded();
+    // Run seed in background (don't block dashboard load)
+    ensureProductsSeeded().catch(e => console.error('[Dashboard] Seed bg error:', e));
 
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
+    const dateFilter = { gte: todayStart, lte: todayEnd };
 
-    // Today's sales total
-    const todaySalesResult = await db.sale.aggregate({
-      _sum: { total: true },
-      where: {
-        createdAt: {
-          gte: todayStart,
-          lte: todayEnd,
-        },
-      },
-    });
-    const todaySales = todaySalesResult._sum.total || 0;
+    // Each query wrapped independently so one failure doesn't break the rest
+    let todaySales = 0;
+    try {
+      const r = await db.sale.aggregate({ _sum: { total: true }, where: { createdAt: dateFilter } });
+      todaySales = r._sum.total || 0;
+    } catch (e: any) { console.error('[Dashboard] todaySales failed:', e.message?.slice(0, 80)); }
 
-    // Today's purchases total
-    const todayPurchasesResult = await db.purchase.aggregate({
-      _sum: { total: true },
-      where: {
-        createdAt: {
-          gte: todayStart,
-          lte: todayEnd,
-        },
-      },
-    });
-    const todayPurchases = todayPurchasesResult._sum.total || 0;
+    let todayPurchases = 0;
+    try {
+      const r = await db.purchase.aggregate({ _sum: { total: true }, where: { createdAt: dateFilter } });
+      todayPurchases = r._sum.total || 0;
+    } catch (e: any) { console.error('[Dashboard] todayPurchases failed:', e.message?.slice(0, 80)); }
 
-    // Total active products
-    const totalProducts = await db.product.count({
-      where: { isActive: true },
-    });
+    let totalProducts = 0;
+    try {
+      totalProducts = await db.product.count({ where: { isActive: true } });
+    } catch (e: any) { console.error('[Dashboard] totalProducts failed:', e.message?.slice(0, 80)); }
 
-    // Total active customers
-    const totalCustomers = await db.customer.count({
-      where: { isActive: true },
-    });
+    let totalCustomers = 0;
+    try {
+      totalCustomers = await db.customer.count({ where: { isActive: true } });
+    } catch (e: any) { console.error('[Dashboard] totalCustomers failed:', e.message?.slice(0, 80)); }
 
-    // Low stock products - fetch all and filter in JS (Prisma can't compare two fields)
-    const allActiveProducts = await db.product.findMany({
-      where: { isActive: true },
-      include: { subCategory: true, group: true, unit: true },
-    });
-    const lowStockProducts = allActiveProducts
-      .filter(p => p.stock <= p.minStock)
-      .sort((a, b) => a.stock - b.stock);
+    let lowStockProducts: any[] = [];
+    try {
+      const all = await db.product.findMany({ where: { isActive: true } });
+      lowStockProducts = all.filter(p => p.stock <= p.minStock).sort((a, b) => a.stock - b.stock).slice(0, 20);
+    } catch (e: any) { console.error('[Dashboard] lowStock failed:', e.message?.slice(0, 80)); }
 
-    // Recent sales (last 5)
-    const recentSales = await db.sale.findMany({
-      take: 5,
-      include: {
-        customer: true,
-        items: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    let recentSales: any[] = [];
+    try {
+      recentSales = await db.sale.findMany({
+        take: 5, orderBy: { createdAt: 'desc' },
+        include: { customer: { select: { name: true } }, items: { select: { id: true } } },
+      });
+    } catch (e: any) { console.error('[Dashboard] recentSales failed:', e.message?.slice(0, 80)); }
 
-    // Today's expenses
-    const todayExpensesResult = await db.expense.aggregate({
-      _sum: { amount: true },
-      where: { createdAt: { gte: todayStart, lte: todayEnd } },
-    });
-    const totalExpenses = todayExpensesResult._sum.amount || 0;
+    let totalExpenses = 0;
+    try {
+      const r = await db.expense.aggregate({ _sum: { amount: true }, where: { createdAt: dateFilter } });
+      totalExpenses = r._sum.amount || 0;
+    } catch (e: any) { console.error('[Dashboard] expenses failed:', e.message?.slice(0, 80)); }
 
-    // Total stock value (reuse allActiveProducts from above)
-    const totalStockValue = allActiveProducts.reduce((sum, p) => sum + (p.stock * p.purchasePrice), 0);
+    let totalStockValue = 0;
+    try {
+      const prods = await db.product.findMany({ where: { isActive: true }, select: { stock: true, purchasePrice: true } });
+      totalStockValue = prods.reduce((s, p) => s + (p.stock * p.purchasePrice), 0);
+    } catch (e: any) { console.error('[Dashboard] stockValue failed:', e.message?.slice(0, 80)); }
 
-    // Today's profit (sale total - cost of items sold today)
-    const todaySalesItems = await db.saleItem.findMany({
-      where: { sale: { createdAt: { gte: todayStart, lte: todayEnd } } },
-      include: { product: { select: { purchasePrice: true } } },
-    });
-    const todayCost = todaySalesItems.reduce((sum, item) => {
-      return sum + (item.quantity * (item.product?.purchasePrice || 0));
-    }, 0);
-    const todayProfit = todaySales - todayCost;
+    let todayProfit = 0;
+    try {
+      const saleItems = await db.saleItem.findMany({
+        where: { sale: { createdAt: dateFilter } },
+        include: { product: { select: { purchasePrice: true } } },
+      });
+      const cost = saleItems.reduce((s, i) => s + (i.quantity * (i.product?.purchasePrice || 0)), 0);
+      todayProfit = todaySales - cost;
+    } catch (e: any) { console.error('[Dashboard] profit failed:', e.message?.slice(0, 80)); }
 
     return NextResponse.json({
-      todaySales,
-      todayPurchases,
-      totalProducts,
-      totalCustomers,
-      lowStockProducts,
-      recentSales,
-      totalExpenses,
-      totalStockValue,
-      todayProfit,
+      todaySales, todayPurchases, totalProducts, totalCustomers,
+      lowStockProducts, recentSales, totalExpenses, totalStockValue, todayProfit,
     });
   } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
-    return NextResponse.json({ error: 'Failed to fetch dashboard stats' }, { status: 500 });
+    console.error('[Dashboard] Fatal error:', error);
+    return NextResponse.json({ error: 'Failed to load dashboard' }, { status: 500 });
   }
 }
