@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { Sidebar } from '@/components/pos/Sidebar';
-import { LoginPage } from '@/components/pos/LoginPage';
 import { Dashboard } from '@/components/pos/Dashboard';
 import { ProductsPage } from '@/components/pos/ProductsPage';
 import { CustomersPage } from '@/components/pos/CustomersPage';
@@ -28,7 +27,7 @@ import { cn } from '@/lib/utils';
 type Page = 'dashboard' | 'products' | 'customers' | 'sales' | 'purchases' | 'purchase_returns' | 'vendors' | 'classifications' | 'stock' | 'expenses' | 'bank' | 'reports' | 'daily_closing' | 'customer_ledger' | 'users' | 'settings' | 'network' | 'my_settings';
 
 export default function Home() {
-  const { user, lang, theme, token, hasPermission } = useAppStore();
+  const { user, lang, theme, token, hasPermission, setAuth } = useAppStore();
   const [activePage, setActivePage] = useState<Page>('dashboard');
   const [lowStockCount, setLowStockCount] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -43,30 +42,31 @@ export default function Home() {
   }, [theme, lang]);
 
   useEffect(() => {
-    // Step 1: Initialize DB in background (schema + seed + admin creation)
-    // This runs regardless of auth state so DB is always ready
+    // Initialize DB and auto-login: get auth directly from server
+    // No login page — app opens directly to dashboard
     fetch('/api/auth/auto-login', { method: 'POST' })
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then(data => {
-        // DB is now ready (schema created, products seeded, admin exists)
+        if (data.user && data.token) {
+          setAuth(data.user, data.token);
+        }
         setDbReady(true);
       })
       .catch(() => {
-        // Even if auto-login fails, mark dbReady so login page can work
+        // Even if auto-login fails, try to restore from localStorage
+        const savedUser = localStorage.getItem('pos-user');
+        const savedToken = localStorage.getItem('pos-token');
+        if (savedUser && savedToken) {
+          try {
+            const parsed = JSON.parse(savedUser);
+            setAuth(parsed, savedToken);
+          } catch { /* ignore */ }
+        }
         setDbReady(true);
       });
-
-    // Step 2: Check for saved session in localStorage
-    // If user was previously logged in, restore their session
-    const savedUser = localStorage.getItem('pos-user');
-    const savedToken = localStorage.getItem('pos-token');
-    if (savedUser && savedToken) {
-      try {
-        const parsed = JSON.parse(savedUser);
-        useAppStore.getState().setAuth(parsed, savedToken);
-      } catch { /* ignore invalid data */ }
-    }
-    // NOTE: No auto-login bypass - user must enter credentials via LoginPage
   }, []);
 
   useEffect(() => {
@@ -79,16 +79,13 @@ export default function Home() {
     }
   }, [user, token]);
 
-  // Only load dashboard data AFTER auto-login completes
+  // Load dashboard data after DB is ready and user is authenticated
   useEffect(() => {
     if (!user || !dbReady) return;
     const load = async () => {
       try {
         const res = await fetch('/api/dashboard');
-        if (!res.ok) {
-          // Silently skip on error - will retry on next interval
-          return;
-        }
+        if (!res.ok) return;
         const data = await res.json();
         if (data.lowStockProducts) setLowStockCount(data.lowStockProducts.length);
       } catch { /* ignore */ }
@@ -98,31 +95,37 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [user, dbReady]);
 
-  if (!mounted) {
-    return <div className="flex items-center justify-center h-screen"><div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" /></div>;
-  }
-
-  if (!user) {
-    // Show Login Page when not authenticated
-    return <LoginPage />;
-  }
-
-  // Show preparing state until DB is ready
-  if (!dbReady) {
+  if (!mounted || !dbReady) {
     return (
       <div className={cn(
-        "flex h-screen overflow-hidden transition-colors duration-300",
+        "flex items-center justify-center h-screen transition-colors duration-300",
         isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
       )}>
-        <Sidebar activePage={activePage} onNavigate={setActivePage} lowStockCount={0} />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center space-y-3">
-            <div className="animate-spin h-10 w-10 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto" />
-            <p className="text-sm text-muted-foreground">
-              {lang === 'ur' ? 'ڈیٹا بیس تیار ہو رہا ہے...' : 'Preparing database...'}
-            </p>
-          </div>
-        </main>
+        <div className="text-center space-y-3">
+          <div className="animate-spin h-10 w-10 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto" />
+          <p className="text-sm text-muted-foreground">
+            {lang === 'ur' ? 'سسٹم تیار ہو رہا ہے...' : 'Preparing system...'}
+          </p>
+        </div>
+        <Toaster position="top-right" />
+      </div>
+    );
+  }
+
+  // If still no user after dbReady (shouldn't happen normally), show error
+  if (!user) {
+    return (
+      <div className={cn(
+        "flex flex-col items-center justify-center h-screen gap-4 transition-colors duration-300",
+        isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+      )}>
+        <p className="text-red-500">{lang === 'ur' ? 'سسٹم شروع نہیں ہو سکا' : 'System failed to start'}</p>
+        <button
+          className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700"
+          onClick={() => window.location.reload()}
+        >
+          {lang === 'ur' ? 'دوبارہ کوشش کریں' : 'Retry'}
+        </button>
         <Toaster position="top-right" />
       </div>
     );

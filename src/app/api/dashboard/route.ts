@@ -1,14 +1,8 @@
 import { db } from '@/lib/db';
-import { ensureDatabase, ensureAdminUser, ensureProductsSeeded } from '@/lib/db-init';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
-    await ensureDatabase();
-    await ensureAdminUser();
-    // Run seed in background (don't block dashboard load)
-    ensureProductsSeeded().catch(e => console.error('[Dashboard] Seed bg error:', e));
-
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date();
