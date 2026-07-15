@@ -42,9 +42,9 @@ export async function PUT(
       where: { id },
       data: {
         name: body.name,
-        subCategoryId: body.subCategoryId ?? undefined,
-        groupId: body.groupId ?? undefined,
-        unitId: body.unitId ?? undefined,
+        subCategoryId: body.subCategoryId || null,
+        groupId: body.groupId || null,
+        unitId: body.unitId || null,
         purchasePrice: body.purchasePrice ?? undefined,
         salePrice: body.salePrice ?? undefined,
         wholeSalePrice: body.wholeSalePrice ?? undefined,

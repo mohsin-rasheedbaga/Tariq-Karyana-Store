@@ -41,6 +41,11 @@ export async function POST(request: NextRequest) {
     await ensureDatabase();
     const body = await request.json();
 
+    // Server-side validation
+    if (!body.name || !body.name.trim()) {
+      return NextResponse.json({ error: 'Product name is required' }, { status: 400 });
+    }
+
     const barcode = body.barcode || generateProductBarcode();
 
     const product = await db.product.create({

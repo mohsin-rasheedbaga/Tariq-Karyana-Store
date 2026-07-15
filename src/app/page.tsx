@@ -9,18 +9,23 @@ import { ProductsPage } from '@/components/pos/ProductsPage';
 import { CustomersPage } from '@/components/pos/CustomersPage';
 import { SalesPage } from '@/components/pos/SalesPage';
 import { PurchasesPage } from '@/components/pos/PurchasesPage';
+import { PurchaseReturnsPage } from '@/components/pos/PurchaseReturnsPage';
 import { StockPage } from '@/components/pos/StockPage';
 import { ExpensesPage } from '@/components/pos/ExpensesPage';
 import { BankPage } from '@/components/pos/BankPage';
 import { ReportsPage } from '@/components/pos/ReportsPage';
+import { DailyClosingPage } from '@/components/pos/DailyClosingPage';
+import { CustomerLedgerPage } from '@/components/pos/CustomerLedgerPage';
 import { UsersPage } from '@/components/pos/UsersPage';
 import { NetworkPage } from '@/components/pos/NetworkPage';
 import { SettingsPage } from '@/components/pos/SettingsPage';
 import { MySettingsPage } from '@/components/pos/MySettingsPage';
+import { VendorsPage } from '@/components/pos/VendorsPage';
+import { ClassificationsPage } from '@/components/pos/ClassificationsPage';
 import { Toaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 
-type Page = 'dashboard' | 'products' | 'customers' | 'sales' | 'purchases' | 'stock' | 'expenses' | 'bank' | 'reports' | 'users' | 'settings' | 'network' | 'my_settings';
+type Page = 'dashboard' | 'products' | 'customers' | 'sales' | 'purchases' | 'purchase_returns' | 'vendors' | 'classifications' | 'stock' | 'expenses' | 'bank' | 'reports' | 'daily_closing' | 'customer_ledger' | 'users' | 'settings' | 'network' | 'my_settings';
 
 export default function Home() {
   const { user, lang, theme, token, hasPermission } = useAppStore();
@@ -126,6 +131,11 @@ export default function Home() {
       case 'customers': return <CustomersPage />;
       case 'sales': return <SalesPage />;
       case 'purchases': return <PurchasesPage />;
+      case 'purchase_returns': return <PurchaseReturnsPage />;
+      case 'vendors': return <VendorsPage />;
+      case 'classifications': return <ClassificationsPage />;
+      case 'daily_closing': return <DailyClosingPage />;
+      case 'customer_ledger': return <CustomerLedgerPage />;
       case 'stock': return <StockPage />;
       case 'expenses': return <ExpensesPage />;
       case 'bank': return <BankPage />;

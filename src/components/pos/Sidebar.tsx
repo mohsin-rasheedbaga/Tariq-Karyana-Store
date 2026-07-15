@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Package, Users, ShoppingCart, Truck, Warehouse,
   DollarSign, Settings, CreditCard, TrendingUp, AlertTriangle,
   LogOut, Languages, Sun, Moon, UserCog, Wifi, ChevronLeft, ChevronRight,
-  Bell, UserCircle, X
+  Bell, UserCircle, X, RotateCcw, CalendarDays, BookOpen, Store, Tags
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -16,7 +16,7 @@ import { useAppStore, Notification } from '@/store/app-store';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
-type Page = 'dashboard' | 'products' | 'customers' | 'sales' | 'purchases' | 'stock' | 'expenses' | 'bank' | 'reports' | 'users' | 'settings' | 'network' | 'my_settings';
+type Page = 'dashboard' | 'products' | 'customers' | 'sales' | 'purchases' | 'purchase_returns' | 'vendors' | 'classifications' | 'stock' | 'expenses' | 'bank' | 'reports' | 'daily_closing' | 'customer_ledger' | 'users' | 'settings' | 'network' | 'my_settings';
 
 interface NavItem {
   id: Page;
@@ -30,10 +30,15 @@ const navItems: NavItem[] = [
   { id: 'products', key: 'nav.products', icon: <Package className="h-5 w-5" />, section: 'nav.main' },
   { id: 'customers', key: 'nav.customers', icon: <Users className="h-5 w-5" />, section: 'nav.main' },
   { id: 'purchases', key: 'nav.purchases', icon: <Truck className="h-5 w-5" />, section: 'nav.main' },
+  { id: 'purchase_returns', key: 'nav.purchase_returns', icon: <RotateCcw className="h-5 w-5" />, section: 'nav.main' },
+  { id: 'vendors', key: 'nav.vendors', icon: <Store className="h-5 w-5" />, section: 'nav.main' },
+  { id: 'classifications', key: 'nav.classifications', icon: <Tags className="h-5 w-5" />, section: 'nav.main' },
   { id: 'stock', key: 'nav.stock', icon: <Warehouse className="h-5 w-5" />, section: 'nav.inventory' },
   { id: 'expenses', key: 'nav.expenses', icon: <DollarSign className="h-5 w-5" />, section: 'nav.finance' },
   { id: 'bank', key: 'nav.bank', icon: <CreditCard className="h-5 w-5" />, section: 'nav.finance' },
   { id: 'reports', key: 'nav.reports', icon: <TrendingUp className="h-5 w-5" />, section: 'nav.finance' },
+  { id: 'daily_closing', key: 'nav.daily_closing', icon: <CalendarDays className="h-5 w-5" />, section: 'nav.finance' },
+  { id: 'customer_ledger', key: 'nav.customer_ledger', icon: <BookOpen className="h-5 w-5" />, section: 'nav.finance' },
   { id: 'users', key: 'nav.users', icon: <UserCog className="h-5 w-5" />, section: 'nav.system' },
   { id: 'settings', key: 'nav.settings', icon: <Settings className="h-5 w-5" />, section: 'nav.system' },
   { id: 'network', key: 'nav.network', icon: <Wifi className="h-5 w-5" />, section: 'nav.system' },
