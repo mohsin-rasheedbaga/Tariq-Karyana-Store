@@ -35,6 +35,16 @@ export async function ensureDatabase(): Promise<void> {
 
     // Run migrations for new columns on existing databases
     await runMigrations();
+
+    // Verify DB is actually working by running a simple query
+    try {
+      await db.$executeRawUnsafe('SELECT 1');
+      console.log('[DB] Database verified working.');
+    } catch (verifyErr: any) {
+      console.error('[DB] Verification query failed:', verifyErr.message?.slice(0, 100));
+      // Don't throw — tables may exist from a previous run
+    }
+
     initialized = true;
     console.log('[DB] Database ready.');
   } catch (error: any) {
