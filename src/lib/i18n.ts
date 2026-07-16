@@ -287,7 +287,7 @@ export const translations: Record<Lang, Record<string, string>> = {
 
     // Login
     'login.title': 'Tariq Kiryana Store',
-    'login.subtitle': 'POS System v1.3.1',
+    'login.subtitle': 'POS System v1.3.2',
     'login.username': 'Username',
     'login.password': 'Password',
     'login.login': 'Login',
@@ -816,7 +816,7 @@ export const translations: Record<Lang, Record<string, string>> = {
 
     // Login
     'login.title': 'طارق کریانہ سٹور',
-    'login.subtitle': 'POS سسٹم v1.3.1',
+    'login.subtitle': 'POS سسٹم v1.3.2',
     'login.username': 'یوزر نیم',
     'login.password': 'پاسورڈ',
     'login.login': 'لاگ ان',

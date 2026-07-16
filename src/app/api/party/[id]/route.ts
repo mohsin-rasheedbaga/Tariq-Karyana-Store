@@ -1,5 +1,4 @@
 import { db } from '@/lib/db';
-import { ensureDatabase } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -7,7 +6,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await ensureDatabase();
     const { id } = await params;
     const party = await db.party.findUnique({
       where: { id },
@@ -29,7 +27,6 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await ensureDatabase();
     const { id } = await params;
     const body = await request.json();
 
@@ -54,7 +51,6 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await ensureDatabase();
     const { id } = await params;
 
     // Check if vendor has active purchases

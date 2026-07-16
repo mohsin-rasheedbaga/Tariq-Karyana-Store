@@ -1,5 +1,4 @@
 import { db } from '@/lib/db';
-import { ensureDatabase } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -7,7 +6,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await ensureDatabase();
     const { id } = await params;
     const sale = await db.sale.findUnique({
       where: { id },

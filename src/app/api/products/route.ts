@@ -1,11 +1,9 @@
 import { db } from '@/lib/db';
 import { generateProductBarcode } from '@/lib/barcode';
-import { ensureDatabase } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    await ensureDatabase();
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
 
@@ -38,7 +36,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    await ensureDatabase();
     const body = await request.json();
 
     // Server-side validation

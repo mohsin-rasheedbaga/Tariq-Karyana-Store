@@ -1,5 +1,4 @@
 import { db } from '@/lib/db';
-import { ensureDatabase } from '@/lib/db-init';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -7,7 +6,6 @@ export async function GET() {
   
   // 1. DB init
   try {
-    await ensureDatabase();
     info.dbInit = 'ok';
   } catch (e: any) {
     info.dbInit = 'FAILED: ' + (e.message || '').slice(0, 100);
