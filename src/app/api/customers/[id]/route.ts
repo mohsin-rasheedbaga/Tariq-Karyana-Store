@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import { ensureDbReady } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -27,6 +28,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const { id } = await params;
     const body = await request.json();
 
@@ -54,6 +58,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const { id } = await params;
     const customer = await db.customer.update({
       where: { id },
@@ -73,6 +80,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const { id } = await params;
     const { amount, description } = await request.json();
 

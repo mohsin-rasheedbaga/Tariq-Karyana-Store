@@ -1,5 +1,7 @@
 import { db } from '@/lib/db';
 import { generateInvoiceNo } from '@/lib/barcode';
+import { ensureDbReady } from '@/lib/db-init';
+import { safeTransaction } from '@/lib/safe-transaction';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -37,6 +39,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const body = await request.json();
     const { partyId, originalInvoiceNo, items } = body;
 
@@ -51,13 +56,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Get settings and generate return number
-    const settings = await db.settings.findFirst();
-    if (!settings) {
-      return NextResponse.json({ error: 'Settings not found. Please initialize settings first.' }, { status: 400 });
-    }
-
-    const returnNo = generateInvoiceNo('PRET', settings.purchaseReturnNo);
+    // Get settings and generate return number. ensureDbReady() should guarantee a
+    // row exists, but we keep a defensive fallback just in case.
+    // v1.3.3: settings read moved INSIDE transaction below to prevent duplicate returnNo.
 
     // Calculate totals
     const subtotal = items.reduce(
@@ -67,7 +68,14 @@ export async function POST(request: NextRequest) {
     const total = subtotal;
 
     // Create purchase return in a transaction
-    const purchaseReturn = await db.$transaction(async (tx) => {
+    const purchaseReturn = await safeTransaction(async (tx) => {
+      // v1.3.3 FIX: Read settings INSIDE the transaction to prevent duplicate returnNo.
+      let settings = await tx.settings.findFirst();
+      if (!settings) {
+        settings = await tx.settings.create({ data: {} });
+      }
+      const returnNo = generateInvoiceNo('PRET', settings.purchaseReturnNo);
+
       // Update settings return number
       await tx.settings.update({
         where: { id: settings.id },

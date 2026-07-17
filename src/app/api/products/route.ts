@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { generateProductBarcode } from '@/lib/barcode';
+import { ensureDbReady } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -36,6 +37,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const body = await request.json();
 
     // Server-side validation

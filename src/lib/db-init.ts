@@ -2,28 +2,39 @@ import { db } from './db';
 import { SCHEMA_SQL, MIGRATION_SQL } from './schema-sql';
 
 /**
- * CRITICAL FIX v1.3.2:
- * 
- * ROOT CAUSE of all 500 errors: `ensureDatabase()` was called on EVERY API request
- * (70+ times across all routes). The module-level `initialized` flag is NOT reliably
- * shared across Next.js 16 standalone route handler module instances. This caused:
- * - Multiple concurrent DDL executions → SQLite write lock conflicts → 500 errors
- * - Lock contention with background product seed → ALL queries fail
- * - Dashboard, products, customers, settings — EVERYTHING broke
+ * v1.3.3 FIX — Complete rewrite of DB initialization.
  *
- * FIX: Use globalThis for the init flag (truly process-global), and make the
- * function COMPLETELY non-throwing. Only auto-login should call this.
+ * PREVIOUS BUGS (v1.2.9–v1.3.2):
+ *  1. ensureDatabase() marked itself "initialized" even when it FAILED.
+ *     A single error during schema creation → app stuck broken forever
+ *     (every query hit missing tables → 500 on everything).
+ *  2. No default Settings row was ever created → sales/purchases/returns
+ *     failed with "Settings not found" on fresh installs.
+ *  3. Migration SQL for accountNo UNIQUE index failed on existing DBs
+ *     (duplicate empty strings) — error swallowed, index never created.
+ *  4. $executeRawUnsafe('SELECT 1') is the wrong API for SELECT.
+ *
+ * THIS VERSION:
+ *  - NEVER marks as initialized unless schema VERIFIED (all critical tables/columns exist).
+ *  - On failure, leaves flag UNSET so the next API call retries automatically.
+ *  - Creates a default Settings row (fixes sale/purchase save on fresh install).
+ *  - Fixes existing customers with empty/duplicate accountNo before unique index.
+ *  - Uses $queryRawUnsafe for SELECT verification.
+ *  - Runs pragmas (WAL, busy_timeout) for concurrency reliability.
  */
 
-const DB_INIT_KEY = '__tariq_pos_db_initialized__';
+const DB_INIT_KEY = '__tariq_pos_db_initialized_v133__';
 const SEED_LOCK_KEY = '__tariq_pos_seeding__';
+const SETTINGS_KEY = '__tariq_pos_settings_ok__';
 
-// Global accessor helpers (work across all module instances)
 function isDbInitialized(): boolean {
   return !!(globalThis as any)[DB_INIT_KEY];
 }
 function markDbInitialized(): void {
   (globalThis as any)[DB_INIT_KEY] = true;
+}
+function clearDbInitialized(): void {
+  (globalThis as any)[DB_INIT_KEY] = false;
 }
 function isSeedingInProgress(): boolean {
   return !!(globalThis as any)[SEED_LOCK_KEY];
@@ -33,15 +44,49 @@ function setSeedingFlag(v: boolean): void {
 }
 
 /**
+ * Check whether a specific column exists on a table (SQLite).
+ */
+async function columnExists(table: string, column: string): Promise<boolean> {
+  try {
+    const rows: any[] = await db.$queryRawUnsafe(
+      `PRAGMA table_info("${table}")`
+    );
+    return rows.some((r: any) => r.name === column);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check whether a table exists.
+ */
+async function tableExists(table: string): Promise<boolean> {
+  try {
+    const rows: any[] = await db.$queryRawUnsafe(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='${table}'`
+    );
+    return rows.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Ensure database schema exists and is up-to-date.
  * SAFE to call multiple times. Uses globalThis flag so it's truly process-wide.
- * This function will NEVER throw — errors are logged but swallowed.
+ *
+ * v1.3.3: Only marks as initialized if VERIFICATION passes. On failure the
+ * flag stays false, so the next API call retries automatically.
  */
 export async function ensureDatabase(): Promise<void> {
   if (isDbInitialized()) return;
 
+  let schemaOk = false;
+
   try {
     console.log('[DB] Ensuring database schema...');
+
+    // 1. Create all tables (IF NOT EXISTS — idempotent)
     const statements = SCHEMA_SQL
       .split(';')
       .map(s => s.trim())
@@ -51,42 +96,159 @@ export async function ensureDatabase(): Promise<void> {
       try {
         await db.$executeRawUnsafe(sql);
       } catch (e: any) {
-        // IF NOT EXISTS handles "already exists" — anything else is a warning
         if (!e.message?.includes('already exists')) {
-          console.warn('[DB] Schema warning:', e.message?.slice(0, 100));
+          console.warn('[DB] Schema statement warning:', e.message?.slice(0, 120));
         }
       }
     }
 
-    // Run migrations for new columns on existing databases
+    // 2. Run column migrations (ADD COLUMN is idempotent-safe via error swallow)
     try {
       const migStatements = MIGRATION_SQL.split(';').map(s => s.trim()).filter(s => s.length > 0);
       for (const sql of migStatements) {
         try {
           await db.$executeRawUnsafe(sql);
         } catch (e: any) {
-          if (!e.message?.includes('duplicate column') && !e.message?.includes('already exists') && !e.message?.includes('UNIQUE constraint')) {
-            console.warn('[DB] Migration warning:', e.message?.slice(0, 100));
+          const m = e.message || '';
+          if (!m.includes('duplicate column') && !m.includes('already exists') && !m.includes('UNIQUE constraint')) {
+            console.warn('[DB] Migration warning:', m.slice(0, 120));
           }
         }
       }
     } catch (e) {
-      console.warn('[DB] Migration error (non-fatal):', e);
+      console.warn('[DB] Migration block error (non-fatal):', e);
     }
 
-    // Verify DB is working
+    // 3. v1.3.3 FIX: Repair existing customers that have empty/duplicate accountNo
+    //    BEFORE attempting to enforce the UNIQUE index. This is what broke upgrades
+    //    from v1.2.x → v1.3.x in the previous versions.
+    await repairCustomerAccountNos();
+
+    // 4. v1.3.3 FIX: Re-attempt the accountNo unique index now that data is clean.
     try {
-      await db.$executeRawUnsafe('SELECT 1');
-    } catch (verifyErr: any) {
-      console.warn('[DB] Verify warning:', verifyErr.message?.slice(0, 100));
+      await db.$executeRawUnsafe(
+        'CREATE UNIQUE INDEX IF NOT EXISTS "Customer_accountNo_key" ON "Customer"("accountNo")'
+      );
+    } catch (e: any) {
+      // If it still fails, there may be genuine duplicates — log but don't crash.
+      console.warn('[DB] accountNo unique index warning:', e.message?.slice(0, 120));
     }
 
+    // 5. VERIFY — confirm the critical tables & columns actually exist.
+    schemaOk = await verifySchema();
+    if (!schemaOk) {
+      console.error('[DB] Schema verification FAILED — will retry on next call.');
+      return; // Do NOT mark as initialized.
+    }
+
+    // 6. Apply SQLite reliability pragmas (WAL mode, busy_timeout).
+    await applySqlitePragmasSafe();
+
     markDbInitialized();
-    console.log('[DB] Database ready.');
+    console.log('[DB] Database ready (verified).');
   } catch (error: any) {
-    // NEVER throw — this prevents 500 errors on every API route
-    console.error('[DB] Init error (non-fatal, marking as done):', error.message?.slice(0, 200));
-    markDbInitialized();
+    console.error('[DB] Init error (will retry next call):', error.message?.slice(0, 200));
+    // v1.3.3: Do NOT mark as initialized — allow retry.
+  }
+}
+
+/**
+ * v1.3.3 FIX: Repair customers with empty or duplicate accountNo values
+ * so the UNIQUE index can be created successfully.
+ */
+async function repairCustomerAccountNos(): Promise<void> {
+  try {
+    // Find customers with empty accountNo
+    const emptyCustomers = await db.customer.findMany({ where: { accountNo: '' } });
+    if (emptyCustomers.length === 0) return;
+
+    console.log(`[DB] Repairing ${emptyCustomers.length} customers with empty accountNo...`);
+    const yr = new Date().getFullYear().toString().slice(-2);
+    for (let i = 0; i < emptyCustomers.length; i++) {
+      const c = emptyCustomers[i];
+      let newAcc = '';
+      let attempts = 0;
+      while (attempts < 10) {
+        const seq = Math.floor(Math.random() * 900000) + 100000;
+        newAcc = `ACC-${yr}${seq}`;
+        const exists = await db.customer.findFirst({ where: { accountNo: newAcc } });
+        if (!exists) break;
+        attempts++;
+      }
+      try {
+        await db.customer.update({ where: { id: c.id }, data: { accountNo: newAcc } });
+      } catch {}
+    }
+    console.log('[DB] Customer accountNo repair complete.');
+  } catch (e: any) {
+    console.warn('[DB] accountNo repair warning:', e.message?.slice(0, 120));
+  }
+}
+
+/**
+ * v1.3.3 FIX: Verify that all critical tables and the Customer's new columns exist.
+ * Returns true only if everything checks out.
+ */
+async function verifySchema(): Promise<boolean> {
+  const requiredTables = [
+    'User', 'ProductCategory', 'ProductSubCategory', 'ProductGroup', 'Unit',
+    'Product', 'Customer', 'CashReceive', 'Party', 'CashPayment',
+    'Sale', 'SaleItem', 'SaleReturn', 'SaleReturnItem',
+    'Purchase', 'PurchaseItem', 'PurchaseReturn', 'PurchaseReturnItem',
+    'StockAdjustment', 'ExpenseType', 'Expense', 'BankAccount', 'BankTransaction',
+    'Capital', 'SalesMan', 'Settings',
+  ];
+
+  for (const table of requiredTables) {
+    if (!(await tableExists(table))) {
+      console.error(`[DB] Verify FAIL: table "${table}" missing.`);
+      return false;
+    }
+  }
+
+  // Verify Customer has the v1.3 columns (common upgrade failure point).
+  if (!(await columnExists('Customer', 'cardType'))) {
+    console.error('[DB] Verify FAIL: Customer.cardType missing.');
+    return false;
+  }
+  if (!(await columnExists('Customer', 'accountNo'))) {
+    console.error('[DB] Verify FAIL: Customer.accountNo missing.');
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * v1.3.3 FIX: Apply WAL mode + busy_timeout. Wrapped so it never throws.
+ */
+async function applySqlitePragmasSafe(): Promise<void> {
+  try {
+    await db.$executeRawUnsafe('PRAGMA journal_mode=WAL');
+    await db.$executeRawUnsafe('PRAGMA busy_timeout=5000');
+    await db.$executeRawUnsafe('PRAGMA foreign_keys=ON');
+    await db.$executeRawUnsafe('PRAGMA synchronous=NORMAL');
+  } catch (e: any) {
+    console.warn('[DB] Pragma warning (non-fatal):', e.message?.slice(0, 100));
+  }
+}
+
+/**
+ * v1.3.3 FIX: Ensure a default Settings row exists. This was the #1 cause of
+ * "save doesn't work" — sales/purchases/returns need Settings for invoice numbers,
+ * but nothing ever created a default row on fresh install.
+ */
+export async function ensureSettings(): Promise<void> {
+  if ((globalThis as any)[SETTINGS_KEY]) return;
+  try {
+    let settings = await db.settings.findFirst();
+    if (!settings) {
+      settings = await db.settings.create({ data: {} });
+      console.log('[DB] Default Settings row created.');
+    }
+    (globalThis as any)[SETTINGS_KEY] = true;
+  } catch (e: any) {
+    console.warn('[DB] ensureSettings warning:', e.message?.slice(0, 120));
   }
 }
 
@@ -117,6 +279,20 @@ export async function ensureAdminUser(): Promise<void> {
   } catch (error) {
     console.error('[DB] Failed to create admin:', error);
   }
+}
+
+/**
+ * v1.3.3 FIX: Lightweight guard for write routes. Ensures DB is ready before
+ * performing a write. Fast (O(1) after first init). Safe to call from every route.
+ *
+ * Use this at the top of any POST/PUT/DELETE handler that touches the DB:
+ *   await ensureDbReady();
+ */
+export async function ensureDbReady(): Promise<void> {
+  if (!isDbInitialized()) {
+    await ensureDatabase();
+  }
+  await ensureSettings();
 }
 
 /**

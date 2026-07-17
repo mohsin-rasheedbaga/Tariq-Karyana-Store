@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { ensureDbReady } from '@/lib/db-init';
 
 export async function POST(request: NextRequest) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const { username, password, fullName, role, permissions } = await request.json();
     if (!username || !password || !fullName) {
       return NextResponse.json({ error: 'All fields required' }, { status: 400 });
@@ -35,6 +39,9 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const { id, username, fullName, role, isActive, password, permissions, currentPassword } = await request.json();
     
     // If currentPassword is provided, verify it first (for self password change)
@@ -72,6 +79,9 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });

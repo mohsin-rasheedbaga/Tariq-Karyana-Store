@@ -1,5 +1,7 @@
 import { db } from '@/lib/db';
 import { generateInvoiceNo } from '@/lib/barcode';
+import { ensureDbReady } from '@/lib/db-init';
+import { safeTransaction } from '@/lib/safe-transaction';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
@@ -25,33 +27,33 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net).
+    await ensureDbReady();
+
     const body = await request.json();
     const { partyId, purchaseType, items, paid, remarks } = body;
 
-    // Get settings and increment purchase invoice number
-    const settings = await db.settings.findFirst();
-    if (!settings) {
-      return NextResponse.json({ error: 'Settings not found. Please initialize settings first.' }, { status: 400 });
-    }
-
-    const invoiceNo = generateInvoiceNo('PUR', settings.purchaseInvoiceNo);
-
-    // Calculate subtotal and total
+    // Calculate subtotal and total (outside transaction — pure computation)
     const subtotal = items.reduce((sum: number, item: { quantity: number; price: number }) => {
       return sum + item.quantity * item.price;
     }, 0);
-
     const total = subtotal;
 
-    // Create purchase with items in a transaction
-    const purchase = await db.$transaction(async (tx) => {
-      // Update settings invoice number
+    // v1.3.3 CRITICAL FIX: Read settings + generate invoiceNo INSIDE the transaction
+    // to prevent duplicate invoiceNo under concurrent requests.
+    const purchase = await safeTransaction(async (tx) => {
+      let settings = await tx.settings.findFirst();
+      if (!settings) {
+        settings = await tx.settings.create({ data: {} });
+      }
+
+      const invoiceNo = generateInvoiceNo('PUR', settings.purchaseInvoiceNo);
+
       await tx.settings.update({
         where: { id: settings.id },
         data: { purchaseInvoiceNo: settings.purchaseInvoiceNo + 1 },
       });
 
-      // Create the purchase
       const newPurchase = await tx.purchase.create({
         data: {
           invoiceNo,

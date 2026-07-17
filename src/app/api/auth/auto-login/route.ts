@@ -1,14 +1,18 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { ensureDatabase, ensureAdminUser, ensureProductsSeeded } from '@/lib/db-init';
+import { ensureDatabase, ensureAdminUser, ensureProductsSeeded, ensureSettings } from '@/lib/db-init';
 
 export async function POST() {
   try {
-    // Step 1: Ensure DB schema (fast, idempotent)
+    // Step 1: Ensure DB schema (fast, idempotent — skips if already initialized)
     await ensureDatabase();
 
     // Step 2: Ensure admin user exists (fast)
     await ensureAdminUser();
+
+    // v1.3.3 FIX: Ensure a default Settings row exists. Without this, sales,
+    // purchases, and returns all fail because they need Settings for invoice numbers.
+    await ensureSettings();
 
     // Step 3: Find user FIRST (before slow seed)
     let user = null;

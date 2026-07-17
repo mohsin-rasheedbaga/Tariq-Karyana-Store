@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import { ensureDbReady } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
@@ -17,6 +18,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const body = await request.json();
 
     const group = await db.productGroup.create({

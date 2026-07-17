@@ -1,11 +1,29 @@
 import { db } from '@/lib/db';
 import { generateCustomerBarcode } from '@/lib/barcode';
+import { ensureDbReady } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
-function generateAccountNo(): string {
+/**
+ * v1.3.3 FIX: Generate a unique account number with collision retry.
+ * Previous version used a single Math.random() which can collide (birthday
+ * paradox) → unique constraint violation → 500 error on customer save.
+ */
+async function generateUniqueAccountNo(): Promise<string> {
   const yr = new Date().getFullYear().toString().slice(-2);
-  const seq = Math.floor(Math.random() * 90000) + 10000;
-  return `ACC-${yr}${seq}`;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const seq = Math.floor(Math.random() * 900000) + 100000;
+    const candidate = `ACC-${yr}${seq}`;
+    try {
+      const existing = await db.customer.findFirst({ where: { accountNo: candidate } });
+      if (!existing) return candidate;
+    } catch {
+      // If the check itself fails (e.g., table not ready), return the candidate
+      // and let the create attempt surface any real error.
+      return candidate;
+    }
+  }
+  // Extremely unlikely fallback — append timestamp for uniqueness.
+  return `ACC-${yr}${Date.now().toString().slice(-6)}`;
 }
 
 export async function GET(request: NextRequest) {
@@ -39,10 +57,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // v1.3.3 FIX: Ensure DB is ready before writing (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const body = await request.json();
     const barcode = body.barcode || generateCustomerBarcode();
     const cardType = body.cardType || 'regular';
-    const accountNo = body.accountNo || generateAccountNo();
+    const accountNo = body.accountNo || (await generateUniqueAccountNo());
 
     const customer = await db.customer.create({
       data: {

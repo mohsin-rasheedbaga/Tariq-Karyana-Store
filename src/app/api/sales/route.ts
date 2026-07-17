@@ -1,5 +1,7 @@
 import { db } from '@/lib/db';
 import { generateInvoiceNo } from '@/lib/barcode';
+import { ensureDbReady } from '@/lib/db-init';
+import { safeTransaction } from '@/lib/safe-transaction';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -39,33 +41,38 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // v1.3.3 FIX: Ensure DB + Settings are ready (safety net if auto-login init failed).
+    await ensureDbReady();
+
     const body = await request.json();
     const { customerId, saleManName, saleType, items, discountAmount, paid, remarks } = body;
 
-    // Get settings and increment sale invoice number
-    const settings = await db.settings.findFirst();
-    if (!settings) {
-      return NextResponse.json({ error: 'Settings not found. Please initialize settings first.' }, { status: 400 });
-    }
-
-    const invoiceNo = generateInvoiceNo(settings.invoicePrefix, settings.saleInvoiceNo);
-
-    // Calculate subtotal
+    // Calculate subtotal (outside transaction — pure computation)
     const subtotal = items.reduce((sum: number, item: { quantity: number; price: number }) => {
       return sum + item.quantity * item.price;
     }, 0);
-
     const total = subtotal - (discountAmount || 0);
 
-    // Create sale with items in a transaction
-    const sale = await db.$transaction(async (tx) => {
-      // Update settings invoice number
+    // v1.3.3 CRITICAL FIX: Read settings + generate invoiceNo INSIDE the transaction.
+    // Previous code read settings outside → concurrent sales got the same saleInvoiceNo
+    // → generated duplicate invoiceNo → unique constraint 500 error.
+    // Now each transaction reads the CURRENT saleInvoiceNo after acquiring the write lock.
+    const sale = await safeTransaction(async (tx) => {
+      // Read settings inside the transaction (gets the latest value).
+      let settings = await tx.settings.findFirst();
+      if (!settings) {
+        settings = await tx.settings.create({ data: {} });
+      }
+
+      const invoiceNo = generateInvoiceNo(settings.invoicePrefix, settings.saleInvoiceNo);
+
+      // Increment the invoice number.
       await tx.settings.update({
         where: { id: settings.id },
         data: { saleInvoiceNo: settings.saleInvoiceNo + 1 },
       });
 
-      // Create the sale
+      // Create the sale.
       const newSale = await tx.sale.create({
         data: {
           invoiceNo,
