@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import { ensureDbReady } from '@/lib/db-init';
 import { generateProductBarcode } from '@/lib/barcode';
 import { NextResponse } from 'next/server';
 
@@ -69,6 +70,8 @@ const KARYANA_PRODUCTS = [
 
 export async function POST() {
   try {
+    // Ensure DB schema exists before seeding (fresh-install safety)
+    await ensureDbReady();
     // Ensure groups exist
     const groups = [...new Set(KARYANA_PRODUCTS.map(p => p.group))];
     const groupRecords: Record<string, string> = {};
