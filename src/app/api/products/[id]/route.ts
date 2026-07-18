@@ -7,6 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await ensureDbReady();
     const { id } = await params;
     const product = await db.product.findUnique({
       where: { id },

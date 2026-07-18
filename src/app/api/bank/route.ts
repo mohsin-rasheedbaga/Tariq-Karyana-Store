@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    await ensureDbReady();
     const accounts = await db.bankAccount.findMany({
       orderBy: { createdAt: 'desc' },
     });

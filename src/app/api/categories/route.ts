@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    await ensureDbReady();
     const categories = await db.productCategory.findMany({
       where: { isActive: true },
       include: {

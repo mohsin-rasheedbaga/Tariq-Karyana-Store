@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    await ensureDbReady();
     const parties = await db.party.findMany({
       where: { isActive: true },
       orderBy: { createdAt: 'desc' },

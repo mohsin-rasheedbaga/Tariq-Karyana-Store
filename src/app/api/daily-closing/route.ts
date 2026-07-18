@@ -1,8 +1,10 @@
 import { db } from '@/lib/db';
+import { ensureDbReady } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
+    await ensureDbReady();
     const { searchParams } = new URL(request.url);
     const dateStr = searchParams.get('date') || new Date().toISOString().split('T')[0];
 

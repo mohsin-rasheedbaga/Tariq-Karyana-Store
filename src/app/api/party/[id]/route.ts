@@ -7,6 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await ensureDbReady();
     const { id } = await params;
     const party = await db.party.findUnique({
       where: { id },

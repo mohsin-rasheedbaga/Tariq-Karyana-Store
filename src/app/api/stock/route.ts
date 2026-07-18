@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    await ensureDbReady();
 
     // Show ALL products (not just stock > 0) so inventory is always visible
     const products = await db.product.findMany({

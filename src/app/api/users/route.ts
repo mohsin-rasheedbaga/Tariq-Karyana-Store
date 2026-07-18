@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
+    await ensureDbReady();
     const users = await db.user.findMany({
       select: { id: true, username: true, fullName: true, role: true, permissions: true, isActive: true, lastLogin: true, createdAt: true },
       orderBy: { createdAt: 'desc' },

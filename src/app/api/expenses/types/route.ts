@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    await ensureDbReady();
     const types = await db.expenseType.findMany({
       where: { isActive: true },
       include: {

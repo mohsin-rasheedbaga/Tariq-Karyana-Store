@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    await ensureDbReady();
     const purchases = await db.purchase.findMany({
       include: {
         items: {

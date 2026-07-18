@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    await ensureDbReady();
     const groups = await db.productGroup.findMany({
       where: { isActive: true },
       orderBy: { name: 'asc' },

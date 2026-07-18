@@ -28,6 +28,7 @@ async function generateUniqueAccountNo(): Promise<string> {
 
 export async function GET(request: NextRequest) {
   try {
+    await ensureDbReady();
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
 

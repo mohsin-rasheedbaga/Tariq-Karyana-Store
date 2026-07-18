@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
+    // v1.3.5 FIX: Ensure DB is ready on GET too (safety net if auto-login init failed).
+    await ensureDbReady();
     const { searchParams } = new URL(request.url);
     const from = searchParams.get('from');
     const to = searchParams.get('to');
@@ -39,9 +41,21 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    // v1.3.5 FIX: Auto-create a default "General" expense type if none provided.
+    // Schema requires expenseTypeId (non-null). Previously, sending null caused
+    // PrismaClientValidationError -> 500. Now we ensure a valid type always exists.
+    let expenseTypeId = body.expenseTypeId;
+    if (!expenseTypeId) {
+      let generalType = await db.expenseType.findFirst({ where: { name: 'General' } });
+      if (!generalType) {
+        generalType = await db.expenseType.create({ data: { name: 'General' } });
+      }
+      expenseTypeId = generalType.id;
+    }
+
     const expense = await db.expense.create({
       data: {
-        expenseTypeId: body.expenseTypeId,
+        expenseTypeId,
         amount: body.amount,
         description: body.description || null,
       },

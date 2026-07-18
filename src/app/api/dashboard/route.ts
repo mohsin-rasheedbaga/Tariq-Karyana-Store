@@ -1,9 +1,11 @@
 import { db } from '@/lib/db';
+import { ensureDbReady } from '@/lib/db-init';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
     // Ensure DB schema exists (fast, idempotent — skips if already initialized)
+    await ensureDbReady();
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date();

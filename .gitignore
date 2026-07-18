@@ -14,3 +14,5 @@ tool-results/
 *.db-wal
 *.db-shm
 release-temp/
+tsconfig.tsbuildinfo
+next-env.d.ts

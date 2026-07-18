@@ -1,8 +1,10 @@
 import { db } from '@/lib/db';
+import { ensureDbReady } from '@/lib/db-init';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
+    await ensureDbReady();
     const { searchParams } = new URL(request.url);
     const customerId = searchParams.get('customerId');
     const startDate = searchParams.get('startDate');
