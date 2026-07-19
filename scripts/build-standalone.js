@@ -393,6 +393,33 @@ for (const [name, p] of checks) {
   if (!ok) allOk = false;
 }
 
+// CRITICAL CHECK: a folder existing is not enough — it must actually contain
+// a Windows query engine binary, or every Prisma call will fail at runtime
+// with the app otherwise looking like it built and shipped fine.
+console.log('\n=== Prisma Windows Engine Check ===');
+const prismaClientDir = path.join(standaloneNm, '.prisma', 'client');
+let hasWindowsEngine = false;
+if (fs.existsSync(prismaClientDir)) {
+  const engineFiles = fs.readdirSync(prismaClientDir).filter(f =>
+    (f.endsWith('.node') || f.endsWith('.dll.node')) && f.toLowerCase().includes('windows')
+  );
+  if (engineFiles.length > 0) {
+    hasWindowsEngine = true;
+    console.log(`  OK Windows query engine found: ${engineFiles.join(', ')}`);
+  } else {
+    const allFiles = fs.readdirSync(prismaClientDir);
+    console.log(`  MISSING! No Windows query engine binary in ${prismaClientDir}`);
+    console.log(`  Files present instead: ${allFiles.join(', ') || '(none)'}`);
+    console.log('  FIX: make sure prisma/schema.prisma generator block has');
+    console.log('       binaryTargets = ["native", "windows"], then delete');
+    console.log('       node_modules/.prisma and re-run `npm install` / `prisma generate`');
+    console.log('       before building, so the Windows engine gets downloaded.');
+  }
+} else {
+  console.log(`  MISSING! ${prismaClientDir} does not exist at all.`);
+}
+if (!hasWindowsEngine) allOk = false;
+
 const totalSize = getDirSize(standaloneDir);
 console.log(`\nTotal standalone size: ${formatSize(totalSize)}`);
 

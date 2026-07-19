@@ -1,5 +1,15 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // CRITICAL FIX: without this, `prisma generate` only downloads the query
+  // engine for whatever OS runs `npm install` (e.g. the developer's Mac/Linux
+  // machine or a Linux CI/agent sandbox). This app is packaged ONLY for
+  // Windows (electron-builder --win), so if `native` doesn't happen to be
+  // Windows, the shipped app has NO matching query engine binary at all.
+  // Every single Prisma call then fails at runtime (dashboard 500s, every
+  // save fails, every report fails) — which matches all reported symptoms.
+  // Including "windows" here guarantees the Windows engine is always fetched,
+  // no matter which OS the build is run from.
+  binaryTargets = ["native", "windows"]
 }
 
 datasource db {
