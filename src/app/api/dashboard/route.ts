@@ -1,9 +1,19 @@
-import { db } from '@/lib/db';
+import { db, dbInitError } from '@/lib/db';
 import { ensureDbReady } from '@/lib/db-init';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
+    // v1.3.8: If Prisma itself failed to initialize, surface that error
+    // directly instead of letting downstream queries fail with generic 500.
+    if (dbInitError) {
+      return NextResponse.json({
+        error: 'Database initialization failed',
+        detail: dbInitError,
+        diagnostics: '/api/diagnostics',
+      }, { status: 500 });
+    }
+
     // Ensure DB schema exists (fast, idempotent — skips if already initialized)
     await ensureDbReady();
     const todayStart = new Date();
@@ -74,8 +84,15 @@ export async function GET() {
       todaySales, todayPurchases, totalProducts, totalCustomers,
       lowStockProducts, recentSales, totalExpenses, totalStockValue, todayProfit,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[Dashboard] Fatal:', error);
-    return NextResponse.json({ error: 'Failed to load dashboard' }, { status: 500 });
+    // v1.3.8: Include the ACTUAL error in the response so the user (and we)
+    // can see what's wrong instead of a useless "Failed to load dashboard".
+    return NextResponse.json({
+      error: 'Failed to load dashboard',
+      detail: `${error?.code || ''} ${error?.message || String(error)}`,
+      stack: error?.stack?.split('\n').slice(0, 5).join('\n'),
+      diagnostics: '/api/diagnostics',
+    }, { status: 500 });
   }
 }

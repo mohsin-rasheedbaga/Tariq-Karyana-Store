@@ -1,4 +1,4 @@
-import { db } from './db';
+import { db, dbInitError } from './db';
 import { SCHEMA_SQL, MIGRATION_SQL } from './schema-sql';
 
 /**
@@ -80,6 +80,13 @@ async function tableExists(table: string): Promise<boolean> {
  */
 export async function ensureDatabase(): Promise<void> {
   if (isDbInitialized()) return;
+
+  // v1.3.8: If PrismaClient itself failed to initialize, don't even try to
+  // run schema SQL — it would throw a confusing error. Let the caller surface
+  // dbInitError instead.
+  if (dbInitError || !db) {
+    throw new Error(`Cannot ensure database: ${dbInitError || 'PrismaClient is null'}`);
+  }
 
   let schemaOk = false;
 

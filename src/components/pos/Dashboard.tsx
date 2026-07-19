@@ -25,6 +25,9 @@ export function Dashboard({ onNavigate }: { onNavigate?: (page: Page) => void })
   const { lang, theme, addNotification } = useAppStore();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
+  const [diagnostics, setDiagnostics] = useState<any | null>(null);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const isDark = theme === 'dark';
 
@@ -32,9 +35,20 @@ export function Dashboard({ onNavigate }: { onNavigate?: (page: Page) => void })
 
   const loadDashboard = () => {
     setError(null);
+    setErrorDetail(null);
+    setDiagnostics(null);
+    setShowDiagnostics(false);
     fetch('/api/dashboard')
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      .then(async r => {
+        if (!r.ok) {
+          // Try to extract the actual error detail from the 500 response
+          let detail = '';
+          try {
+            const body = await r.json();
+            detail = body?.detail || body?.error || '';
+          } catch {}
+          throw new Error(`HTTP ${r.status}${detail ? ': ' + detail : ''}`);
+        }
         return r.json();
       })
       .then(data => {
@@ -57,6 +71,20 @@ export function Dashboard({ onNavigate }: { onNavigate?: (page: Page) => void })
       .catch(err => {
         console.error('Dashboard load error:', err);
         setError(err.message);
+        setErrorDetail(err.message);
+      });
+  };
+
+  const fetchDiagnostics = () => {
+    fetch('/api/diagnostics')
+      .then(r => r.json())
+      .then(data => {
+        setDiagnostics(data);
+        setShowDiagnostics(true);
+      })
+      .catch(err => {
+        setDiagnostics({ error: 'Failed to fetch diagnostics: ' + err.message });
+        setShowDiagnostics(true);
       });
   };
 
@@ -66,15 +94,54 @@ export function Dashboard({ onNavigate }: { onNavigate?: (page: Page) => void })
 
   if (error && !stats) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 gap-4">
-        <p className="text-red-500 text-sm">{lang === 'ur' ? 'ڈیش بورڈ لوڈ نہیں ہو سکا' : 'Failed to load dashboard'}</p>
-        <p className="text-xs text-muted-foreground">{error}</p>
-        <button
-          className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700"
-          onClick={() => setRetryCount(c => c + 1)}
-        >
-          {lang === 'ur' ? 'دوبارہ کوشش کریں' : 'Retry'}
-        </button>
+      <div className="flex flex-col items-center justify-center min-h-64 gap-4 p-4">
+        <div className="text-red-500 text-sm font-medium">
+          {lang === 'ur' ? 'ڈیش بورڈ لوڈ نہیں ہو سکا' : 'Failed to load dashboard'}
+        </div>
+        <div className="text-xs text-muted-foreground max-w-2xl text-center break-words font-mono bg-red-50 dark:bg-red-950/20 p-3 rounded border border-red-200 dark:border-red-900">
+          {errorDetail}
+        </div>
+        <div className="flex gap-2 flex-wrap justify-center">
+          <button
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700"
+            onClick={() => setRetryCount(c => c + 1)}
+          >
+            {lang === 'ur' ? 'دوبارہ کوشش کریں' : 'Retry'}
+          </button>
+          <button
+            className="px-4 py-2 bg-slate-700 text-white rounded-lg text-sm hover:bg-slate-800"
+            onClick={fetchDiagnostics}
+          >
+            {lang === 'ur' ? 'تشخیصی رپورٹ دیکھیں' : 'Show Diagnostics'}
+          </button>
+        </div>
+        {showDiagnostics && diagnostics && (
+          <div className="w-full max-w-3xl mt-4 border rounded-lg overflow-hidden">
+            <div className="bg-slate-800 text-white px-4 py-2 flex justify-between items-center">
+              <span className="text-sm font-medium">
+                {lang === 'ur' ? 'تشخیصی رپورٹ (اسے کاپی کر کے بھیجیں)' : 'Diagnostic Report (copy and send this)'}
+              </span>
+              <button
+                className="text-xs bg-emerald-600 hover:bg-emerald-700 px-3 py-1 rounded text-white"
+                onClick={() => {
+                  const text = JSON.stringify(diagnostics, null, 2);
+                  navigator.clipboard?.writeText(text).then(() => {
+                    alert(lang === 'ur' ? 'کاپی ہو گیا!' : 'Copied to clipboard!');
+                  }).catch(() => {
+                    // Fallback: open in new window for manual copy
+                    const w = window.open('', '_blank');
+                    if (w) { w.document.write('<pre>' + text + '</pre>'); w.document.close(); }
+                  });
+                }}
+              >
+                {lang === 'ur' ? 'کاپی کریں' : 'Copy'}
+              </button>
+            </div>
+            <pre className="bg-slate-50 dark:bg-slate-900 text-xs p-4 overflow-auto max-h-96 text-slate-800 dark:text-slate-200">
+{JSON.stringify(diagnostics, null, 2)}
+            </pre>
+          </div>
+        )}
       </div>
     );
   }
